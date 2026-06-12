@@ -1,0 +1,46 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "NoteFlow",
+  "version": "2.4.0",
+  "identifier": "com.jefferyhuang.noteflow",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:3015",
+    "beforeDevCommand": "pnpm dev",
+    "beforeBuildCommand": "pnpm build --mode tauri "
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "NoteFlow",
+        "width": 1600,
+        "height": 1000,
+        "resizable": true,
+        "fullscreen": false,
+        "devtools": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "externalBin": [
+      "bin/NoteFlowBackend/NoteFlowBackend"
+    ],
+    "resources": {
+    "bin/NoteFlowBackend/_internal":"_internal"
+    },
+    "macOS":{
+      "files": {
+               "Frameworks": "bin/NoteFlowBackend/_internal"
+      }
+    },
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/icon.ico",
+      "icons/icon.png"
+    ]
+  }
+}
