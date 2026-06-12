@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Skeleton } from '@/components/Skeleton'
 import {
   Form,
   FormField,
@@ -8,7 +9,6 @@ import {
   FormLabel,
   FormControl,
   FormMessage,
-  FormDescription,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -17,17 +17,9 @@ import { useProviderStore } from '@/store/providerStore'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { testConnection, fetchModels, deleteModelById } from '@/services/model.ts'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select.tsx' // ⚡新增 fetchModels
 import { ModelSelector } from '@/components/Form/modelForm/ModelSelector.tsx'
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert.tsx'
-import { Tags } from 'lucide-react'
-import { X } from 'lucide-react'
+import { Alert, AlertDescription } from '@/components/ui/alert.tsx'
+import { ArrowLeft, Save, TestTube, X, Loader2, RefreshCw } from 'lucide-react'
 import { useModelStore } from '@/store/modelStore'
 
 // ✅ Provider表单schema
@@ -54,6 +46,7 @@ interface IModel {
   permission: string
   root: string
 }
+
 const ProviderForm = ({ isCreate = false }: { isCreate?: boolean }) => {
   let { id } = useParams()
   const navigate = useNavigate()
@@ -66,15 +59,12 @@ const ProviderForm = ({ isCreate = false }: { isCreate?: boolean }) => {
   const [loading, setLoading] = useState(true)
   const [testing, setTesting] = useState(false)
   const [isBuiltIn, setIsBuiltIn] = useState(false)
-  const loadModelsById= useModelStore(state => state.loadModelsById)
-  const [modelOptions, setModelOptions] = useState<IModel[]>([]) // ⚡新增，保存模型列表
-  const [models, setModels]= useState([])
+  const loadModelsById = useModelStore(state => state.loadModelsById)
+  const [modelOptions, setModelOptions] = useState<IModel[]>([])
+  const [models, setModels] = useState([])
   const [modelLoading, setModelLoading] = useState(false)
-  const randomColor = ()=>{
-    return '#' + Math.floor(Math.random() * 16777215).toString(16)
-  }
-
   const [search, setSearch] = useState('')
+
   const providerForm = useForm<ProviderFormValues>({
     resolver: zodResolver(ProviderSchema),
     defaultValues: {
@@ -84,8 +74,9 @@ const ProviderForm = ({ isCreate = false }: { isCreate?: boolean }) => {
       type: 'custom',
     },
   })
+
   const filteredModelOptions = modelOptions.filter(model => {
-    const keywords = search.trim().toLowerCase().split(/\s+/) // 支持多个关键词
+    const keywords = search.trim().toLowerCase().split(/\s+/)
     const target = model.id.toLowerCase()
     return keywords.every(kw => target.includes(kw))
   })
@@ -98,10 +89,8 @@ const ProviderForm = ({ isCreate = false }: { isCreate?: boolean }) => {
   })
 
   useEffect(() => {
-
     const load = async () => {
       if (isEditMode) {
-
         const data = await loadProviderById(id!)
         providerForm.reset(data)
         setIsBuiltIn(data.type === 'built-in')
@@ -115,28 +104,24 @@ const ProviderForm = ({ isCreate = false }: { isCreate?: boolean }) => {
         setIsBuiltIn(false)
       }
       const models = await loadModelsById(id!)
-      if(models){
-        console.log('🔧 模型列表:', models)
+      if (models) {
         setModels(models)
-
       }
       setLoading(false)
     }
     load()
   }, [id])
-  const handelDelete=async (modelId)=>{
+
+  const handelDelete = async (modelId) => {
     if (!window.confirm('确定要删除这个模型吗？')) return
-
     try {
-      const res = await deleteModelById(modelId)
-      console.log('🔧 删除结果:', res)
-
+      await deleteModelById(modelId)
       toast.success('删除成功')
-
     } catch (e) {
       toast.error('删除异常')
     }
   }
+
   // 测试连通性
   const handleTest = async () => {
     const values = providerForm.getValues()
@@ -145,21 +130,15 @@ const ProviderForm = ({ isCreate = false }: { isCreate?: boolean }) => {
       return
     }
     try {
-      if (!id){
+      if (!id) {
         toast.error('请先保存供应商信息')
         return
       }
       setTesting(true)
-     await testConnection({
-             id
-          })
-
-        toast.success('测试连通性成功 🎉')
-
+      await testConnection({ id })
+      toast.success('测试连通性成功 🎉')
     } catch (error) {
-
-      toast.error(`连接失败: ${data.data.msg || '未知错误'}`)
-      // toast.error('测试连通性异常')
+      toast.error('测试连通性失败')
     } finally {
       setTesting(false)
     }
@@ -173,11 +152,10 @@ const ProviderForm = ({ isCreate = false }: { isCreate?: boolean }) => {
       return
     }
     try {
-      setModelLoading(true) // ✅ 开始 loading
-      const res = await fetchModels(id!, { noCache: true }) // 这里稍后解释
+      setModelLoading(true)
+      const res = await fetchModels(id!, { noCache: true })
       if (res.data.code === 0 && res.data.data.models.data.length > 0) {
         setModelOptions(res.data.data.models.data)
-        console.log('🔧 模型列表:', res.data.data)
         toast.success('模型列表加载成功 🎉')
       } else {
         toast.error('未获取到模型列表')
@@ -185,7 +163,7 @@ const ProviderForm = ({ isCreate = false }: { isCreate?: boolean }) => {
     } catch (error) {
       toast.error('加载模型列表失败')
     } finally {
-      setModelLoading(false) // ✅ 结束 loading
+      setModelLoading(false)
     }
   }
 
@@ -195,12 +173,9 @@ const ProviderForm = ({ isCreate = false }: { isCreate?: boolean }) => {
       await updateProvider({ ...values, id: id! })
       toast.success('更新供应商成功')
     } else {
-       id = await addNewProvider({ ...values })
-
+      id = await addNewProvider({ ...values })
       toast.success('新增供应商成功')
     }
-    // 刷新页面
-
   }
 
   // 保存Model信息
@@ -209,128 +184,168 @@ const ProviderForm = ({ isCreate = false }: { isCreate?: boolean }) => {
     await loadModelsById(id!)
   }
 
-  if (loading) return <div className="p-4">加载中...</div>
+  if (loading) return (
+    <div className="mx-auto max-w-2xl space-y-6 p-6">
+      <Skeleton className="h-4 w-32" />
+      <Skeleton className="h-7 w-56" />
+      <div className="rounded-lg border border-border/50 p-5 space-y-4">
+        <Skeleton className="h-5 w-20" />
+        <Skeleton className="h-9 w-full" />
+        <Skeleton className="h-9 w-full" />
+        <Skeleton className="h-9 w-full" />
+        <Skeleton className="h-9 w-24" />
+      </div>
+    </div>
+  )
 
   return (
-    <div className="flex flex-col gap-8 p-4">
-      {/* Provider信息表单 */}
+    <div className="mx-auto max-w-2xl space-y-8 p-6">
+      {/* 返回按钮 */}
+      <button
+        onClick={() => navigate('/settings/model')}
+        className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        返回供应商列表
+      </button>
+
+      {/* ====== Provider信息表单 ====== */}
+      <div>
+        <h2 className="text-xl font-semibold">
+          {isEditMode ? `编辑供应商: ${providerForm.getValues().name}` : '新增模型供应商'}
+        </h2>
+        {!isBuiltIn && (
+          <p className="mt-1 text-xs text-amber-600">
+            自定义模型供应商需要确保兼容 OpenAI SDK
+          </p>
+        )}
+      </div>
+
       <Form {...providerForm}>
-        <form
-          onSubmit={providerForm.handleSubmit(onProviderSubmit)}
-          className="flex max-w-xl flex-col gap-4"
-        >
-          <div className="text-lg font-bold">
-            {isEditMode ? '编辑模型供应商' : '新增模型供应商'}
+        <form onSubmit={providerForm.handleSubmit(onProviderSubmit)} className="space-y-4">
+          <div className="rounded-lg border border-border/50 bg-muted/20 p-5 space-y-4">
+            <h3 className="text-sm font-medium text-foreground">基本信息</h3>
+
+            <FormField
+              control={providerForm.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs text-muted-foreground">名称</FormLabel>
+                  <FormControl>
+                    <Input {...field} disabled={isBuiltIn} placeholder="例如: OpenAI" className="h-9" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={providerForm.control}
+              name="baseUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs text-muted-foreground">API 地址</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="https://api.openai.com/v1" className="h-9 font-mono text-sm" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={providerForm.control}
+              name="apiKey"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs text-muted-foreground">API Key</FormLabel>
+                  <FormControl>
+                    <Input {...field} type="password" placeholder="sk-xxxxxxxxxxxxxxxx" className="h-9 font-mono text-sm" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={providerForm.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs text-muted-foreground">类型</FormLabel>
+                  <FormControl>
+                    <Input {...field} disabled className="h-9 text-sm" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
-          {!isBuiltIn && (
-            <div className="text-sm text-red-500 italic">
-              自定义模型供应商需要确保兼容 OpenAI SDK
-            </div>
-          )}
-          <FormField
-            control={providerForm.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem className="flex items-center gap-4">
-                <FormLabel className="w-24 text-right">名称</FormLabel>
-                <FormControl>
-                  <Input {...field} disabled={isBuiltIn} className="flex-1" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={providerForm.control}
-            name="apiKey"
-            render={({ field }) => (
-              <FormItem className="flex items-center gap-4">
-                <FormLabel className="w-24 text-right">API Key</FormLabel>
-                <FormControl>
-                  <Input {...field} className="flex-1" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={providerForm.control}
-            name="baseUrl"
-            render={({ field }) => (
-              <FormItem className="flex items-center gap-4">
-                <FormLabel className="w-24 text-right">API地址</FormLabel>
-                <FormControl>
-                  <Input {...field} className="flex-1" />
-                </FormControl>
-                <Button type="button" onClick={handleTest} variant="ghost" disabled={testing}>
-                  {testing ? '测试中...' : '测试连通性'}
-                </Button>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={providerForm.control}
-            name="type"
-            render={({ field }) => (
-              <FormItem className="flex items-center gap-4">
-                <FormLabel className="w-24 text-right">类型</FormLabel>
-                <FormControl>
-                  <Input {...field} disabled className="flex-1" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="pt-2">
-            <Button type="submit" disabled={!providerForm.formState.isDirty}>
+
+          {/* 操作按钮组 */}
+          <div className="flex items-center gap-2">
+            <Button type="submit" disabled={!providerForm.formState.isDirty} className="gap-1.5">
+              <Save className="h-4 w-4" />
               {isEditMode ? '保存修改' : '保存创建'}
+            </Button>
+            <Button type="button" onClick={handleTest} variant="outline" disabled={testing} className="gap-1.5">
+              {testing ? <Loader2 className="h-4 w-4 animate-spin" /> : <TestTube className="h-4 w-4" />}
+              测试连通性
             </Button>
           </div>
         </form>
       </Form>
 
-      {/* 模型信息表单 */}
-      <div className="flex max-w-xl flex-col gap-4">
-        <div className="flex flex-col gap-2">
-          <span className="font-bold">模型列表</span>
-          <div className={'flex flex-col gap-2 rounded bg-[#FEF0F0] p-2.5'}>
-            <h2 className={'font-bold'}>注意!</h2>
-            <span>请确保已经保存供应商信息,以及通过测试连通性.</span>
+      {/* ====== 模型管理 ====== */}
+      <div className="rounded-lg border border-border/50 p-5 space-y-4">
+        <h3 className="text-sm font-medium text-foreground">模型管理</h3>
+
+        <Alert className="text-xs border-amber-200 bg-amber-50">
+          <AlertDescription>
+            请确保已经<b>保存供应商信息</b>以及通过<b>测试连通性</b>。
+          </AlertDescription>
+        </Alert>
+
+        <ModelSelector providerId={id!} />
+
+        {/* 已启用模型 */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-foreground">已启用模型</span>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleModelLoad}
+              disabled={modelLoading}
+              className="h-7 text-xs gap-1"
+            >
+              {modelLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />}
+              加载模型列表
+            </Button>
           </div>
-          <ModelSelector providerId={id!} />
-
-          {/*<datalist id="model-options">*/}
-          {/*  {modelOptions.map(model => (*/}
-          {/*    <option key={model.id + '1'} value={model.id} />*/}
-          {/*  ))}*/}
-          {/*</datalist>*/}
-        </div>
-        <div className="flex flex-col gap-2">
-          <span className="font-bold">已启用模型</span>
-          <div className={'flex flex-wrap gap-2 rounded  p-2.5'}>
-            {
-              models && models.map(model => {
-                return (
-                  <span key={model.id} className="inline-flex items-center gap-1 rounded-md bg-blue-100 px-2 py-0.5 text-sm text-blue-700">
-                    {model.model_name}
-                    <button type="button" onClick={() => handelDelete(model.id)} className="hover:text-blue-900">
-                      <X className="h-3 w-3" />
-                    </button>
-                  </span>
-
-                )
-              })
-            }
-
+          <div className="flex flex-wrap gap-2">
+            {models && models.length > 0 ? (
+              models.map(model => (
+                <span
+                  key={model.id}
+                  className="inline-flex items-center gap-1 rounded-md bg-primary-light px-2.5 py-1 text-xs font-medium text-primary"
+                >
+                  {model.model_name}
+                  <button
+                    type="button"
+                    onClick={() => handelDelete(model.id)}
+                    className="ml-0.5 rounded-full p-0.5 hover:bg-primary/10 transition-colors"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))
+            ) : (
+              <p className="text-xs text-muted-foreground/60">暂无已启用模型</p>
+            )}
           </div>
-          {/*<ModelSelector providerId={id!} />*/}
-
-          {/*<datalist id="model-options">*/}
-          {/*  {modelOptions.map(model => (*/}
-          {/*    <option key={model.id + '1'} value={model.id} />*/}
-          {/*  ))}*/}
-          {/*</datalist>*/}
         </div>
       </div>
     </div>

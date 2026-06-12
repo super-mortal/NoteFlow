@@ -20,7 +20,7 @@ backend/note_results
 backend/bin/
 
 # 依赖和构建缓存
-node_modules/
+**/node_modules/
 __pycache__/
 *.py[cod]
 dist/

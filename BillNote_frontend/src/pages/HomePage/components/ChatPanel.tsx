@@ -27,7 +27,7 @@ function SourceBadges({ sources }: { sources: ChatSource[] }) {
     <div className="mt-1.5">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="flex items-center gap-1 text-xs text-neutral-400 hover:text-neutral-600"
+        className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
       >
         <BookOpen className="h-3 w-3" />
         <span>引用来源 ({sources.length})</span>
@@ -77,12 +77,10 @@ export default function ChatPanel({ taskId, mode, onModeChange }: ChatPanelProps
         setIndexStatus(res.status)
 
         if (res.status === 'idle') {
-          // 未索引，触发后台索引
           await indexTask(taskId)
           if (!cancelled) setIndexStatus('indexing')
         }
 
-        // indexing 状态持续轮询
         if (res.status === 'indexing' || res.status === 'idle') {
           timer = setTimeout(poll, 2000)
         }
@@ -137,7 +135,6 @@ export default function ChatPanel({ taskId, mode, onModeChange }: ChatPanelProps
     [loading, taskId, currentTask, messages, addMessage],
   )
 
-  // 转换为 Bubble.List 的数据格式
   const bubbleItems = useMemo(() => {
     const items = messages.map((msg, i) => ({
       key: `msg-${i}`,
@@ -161,29 +158,28 @@ export default function ChatPanel({ taskId, mode, onModeChange }: ChatPanelProps
     return items
   }, [messages, loading])
 
-  // Bubble 角色配置
   const roles = useMemo(
     () => ({
       user: {
         placement: 'end' as const,
         avatar: (
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-500 text-white">
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-white shadow-sm">
             <UserRound className="h-4 w-4" />
           </div>
         ),
         variant: 'filled' as const,
-        styles: { content: { background: '#3b82f6', color: '#fff' } },
+        styles: { content: { background: '#3c77fb', color: '#fff', borderRadius: '12px 4px 12px 12px' } },
       },
       ai: {
         placement: 'start' as const,
         avatar: (
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-neutral-500 text-white">
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-muted-foreground/30 text-foreground">
             <Bot className="h-4 w-4" />
           </div>
         ),
         variant: 'outlined' as const,
         contentRender: (content: any) => (
-          <div className="markdown-body prose prose-sm max-w-none prose-p:my-1 prose-li:my-0.5 prose-headings:my-2">
+          <div className="text-sm leading-relaxed prose prose-sm max-w-none prose-p:my-1 prose-li:my-0.5 prose-headings:my-2">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {typeof content === 'string' ? content : String(content)}
             </ReactMarkdown>
@@ -196,11 +192,11 @@ export default function ChatPanel({ taskId, mode, onModeChange }: ChatPanelProps
 
   if (indexStatus === null || indexStatus === 'indexing' || indexStatus === 'idle') {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-3 text-neutral-400">
-        <Loader2 className="h-6 w-6 animate-spin" />
+      <div className="flex h-full flex-col items-center justify-center gap-3 text-muted-foreground">
+        <Loader2 className="h-5 w-5 animate-spin" />
         <div className="text-center">
           <p className="text-sm font-medium">正在索引笔记内容...</p>
-          <p className="mt-1 text-xs">首次使用需下载 Embedding 模型（约 80MB），请耐心等待</p>
+          <p className="mt-1 text-xs text-muted-foreground/70">首次使用需下载 Embedding 模型（约 80MB），请耐心等待</p>
         </div>
       </div>
     )
@@ -208,7 +204,7 @@ export default function ChatPanel({ taskId, mode, onModeChange }: ChatPanelProps
 
   if (indexStatus === 'failed') {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-2 text-neutral-400">
+      <div className="flex h-full flex-col items-center justify-center gap-2 text-muted-foreground">
         <span className="text-sm">索引失败，请重试</span>
         <Button
           size="sm"
@@ -230,15 +226,15 @@ export default function ChatPanel({ taskId, mode, onModeChange }: ChatPanelProps
   }
 
   return (
-    <div className="flex h-full flex-col border-l">
+    <div className="flex h-full flex-col bg-white">
       {/* 头部 */}
-      <div className="flex items-center justify-between border-b px-3 py-2">
-        <span className="text-sm font-medium">AI 问答</span>
+      <div className="flex items-center justify-between border-b border-border/50 px-3 py-2.5 shrink-0">
+        <span className="text-sm font-medium text-foreground">AI 问答</span>
         <div className="flex items-center gap-1">
           <Button
             variant="ghost"
             size="sm"
-            className="h-7 px-2 text-neutral-400 hover:text-neutral-600"
+            className="h-7 px-2 text-muted-foreground hover:text-foreground"
             onClick={() => onModeChange(mode === 'half' ? 'full' : 'half')}
             title={mode === 'half' ? '全屏' : '半屏'}
           >
@@ -252,8 +248,9 @@ export default function ChatPanel({ taskId, mode, onModeChange }: ChatPanelProps
             <Button
               variant="ghost"
               size="sm"
-              className="h-7 px-2 text-neutral-400 hover:text-red-500"
+              className="h-7 px-2 text-muted-foreground hover:text-destructive transition-colors"
               onClick={() => clearChat(taskId)}
+              title="清空对话"
             >
               <Trash2 className="h-3.5 w-3.5" />
             </Button>
@@ -262,9 +259,9 @@ export default function ChatPanel({ taskId, mode, onModeChange }: ChatPanelProps
       </div>
 
       {/* 消息列表 */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-y-auto px-3 py-2 space-y-2">
         {messages.length === 0 && !loading ? (
-          <div className="flex h-full items-center justify-center text-center text-sm text-neutral-400">
+          <div className="flex h-full items-center justify-center text-center text-sm text-muted-foreground/60">
             <div>
               <p>针对笔记内容提问</p>
               <p className="mt-1 text-xs">例如：这个视频的核心观点是什么？</p>
@@ -274,19 +271,23 @@ export default function ChatPanel({ taskId, mode, onModeChange }: ChatPanelProps
           <Bubble.List
             items={bubbleItems}
             role={roles}
-            style={{ height: '100%' }}
+            style={{ height: '100%', background: 'transparent' }}
           />
         )}
       </div>
 
       {/* 输入区域 */}
-      <div className="border-t px-3 py-2">
+      <div className="border-t border-border/50 px-3 py-2 shrink-0">
         <Sender
           value={input}
           onChange={setInput}
           onSubmit={handleSend}
           loading={loading}
           placeholder="输入你的问题..."
+          style={{
+            borderRadius: '8px',
+            border: '1px solid var(--border)',
+          }}
         />
       </div>
     </div>

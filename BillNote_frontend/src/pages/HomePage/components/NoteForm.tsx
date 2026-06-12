@@ -1,4 +1,4 @@
-/* NoteForm.tsx ---------------------------------------------------- */
+/* NoteForm.tsx — 重构版 -------------------------------------------------- */
 import {
   Form,
   FormControl,
@@ -7,12 +7,18 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form.tsx'
-import { useEffect,useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 
-import { Info, Loader2, Plus } from 'lucide-react'
+import {
+  Info,
+  Loader2,
+  Plus,
+  ChevronRight,
+  Sparkles,
+} from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert.tsx'
 import { generateNote } from '@/services/note.ts'
 import { uploadFile } from '@/services/upload.ts'
@@ -40,8 +46,10 @@ import { noteStyles, noteFormats, videoPlatforms } from '@/constant/note.ts'
 import { fetchModels } from '@/services/model.ts'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
+import PlatformIconGroup from '@/components/PlatformIconGroup'
+import CollapsibleSection from '@/components/CollapsibleSection'
 
-/* -------------------- 校验 Schema -------------------- */
+/* -------------------- 校验 Schema（不变）--------------------------- */
 const formSchema = z
   .object({
     video_url: z.string().optional(),
@@ -88,12 +96,12 @@ export type NoteFormValues = z.infer<typeof formSchema>
 /* -------------------- 可复用子组件 -------------------- */
 const SectionHeader = ({ title, tip }: { title: string; tip?: string }) => (
   <div className="my-3 flex items-center justify-between">
-    <h2 className="block">{title}</h2>
+    <h2 className="block text-sm font-medium text-foreground">{title}</h2>
     {tip && (
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Info className="hover:text-primary h-4 w-4 cursor-pointer text-neutral-400" />
+            <Info className="hover:text-primary h-3.5 w-3.5 cursor-pointer text-muted-foreground" />
           </TooltipTrigger>
           <TooltipContent className="text-xs">{tip}</TooltipContent>
         </Tooltip>
@@ -111,9 +119,9 @@ const CheckboxGroup = ({
   onChange: (v: string[]) => void
   disabledMap: Record<string, boolean>
 }) => (
-  <div className="flex flex-wrap space-x-1.5">
+  <div className="flex flex-wrap gap-2">
     {noteFormats.map(({ label, value: v }) => (
-      <label key={v} className="flex items-center space-x-2">
+      <label key={v} className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer">
         <Checkbox
           checked={value.includes(v)}
           disabled={disabledMap[v]}
@@ -163,14 +171,11 @@ const NoteForm = () => {
   /* ---- 副作用 ---- */
   useEffect(() => {
     loadEnabledModels()
-
     return
   }, [])
   useEffect(() => {
     if (!currentTask) return
     const { formData } = currentTask
-
-    console.log('currentTask.formData.platform:', formData.platform)
 
     form.reset({
       platform: formData.platform || 'bilibili',
@@ -187,11 +192,8 @@ const NoteForm = () => {
       format: formData.format ?? [],
     })
   }, [
-    // 当下面任意一个变了，就重新 reset
     currentTaskId,
-    // modelList 用来兜底 model_name
     modelList.length,
-    // 还要加上 formData 的各字段，或者直接 currentTask
     currentTask?.formData,
   ])
 
@@ -205,20 +207,17 @@ const NoteForm = () => {
     setUploadSuccess(false)
 
     try {
-  
-      const  data  = await uploadFile(formData)
-        cb(data.url)
-        setUploadSuccess(true)
+      const data = await uploadFile(formData)
+      cb(data.url)
+      setUploadSuccess(true)
     } catch (err) {
       console.error('上传失败:', err)
-      // message.error('上传失败，请重试')
     } finally {
       setIsUploading(false)
     }
   }
 
   const onSubmit = async (values: NoteFormValues) => {
-    console.log('Not even go here')
     const payload: NoteFormValues = {
       ...values,
       provider_id: modelList.find(m => m.model_name === values.model_name)!.provider_id,
@@ -229,13 +228,10 @@ const NoteForm = () => {
       return
     }
 
-    // message.success('已提交任务')
     try {
       const data = await generateNote(payload)
       addPendingTask(data.task_id, values.platform, payload)
     } catch (e: any) {
-      // 就绪门禁：本地转写模型还没下载好。后端返回 reason='transcriber_model_not_ready'，
-      // 引导用户去「设置 → 音频转写配置」下载，而不是留一个静默失败的任务。
       if (e?.data?.reason === 'transcriber_model_not_ready') {
         const downloading = e?.data?.downloading
         toast.error(
@@ -246,41 +242,14 @@ const NoteForm = () => {
         if (!downloading) navigate('/settings/transcriber')
         return
       }
-      // 其余错误：axios 拦截器已经弹过 toast，这里只兜底不让 promise 变成未处理 rejection
       console.error('提交任务失败：', e)
     }
   }
-  const onInvalid = (errors: FieldErrors<NoteFormValues>) => {
+  const onInvalid = (errors: any) => {
     console.warn('表单校验失败：', errors)
-    // message.error('请完善所有必填项后再提交')
   }
   const handleCreateNew = () => {
-    // 🔁 这里清空当前任务状态
-    // 比如调用 resetCurrentTask() 或者 navigate 到一个新页面
     setCurrentTask(null)
-  }
-  const FormButton = () => {
-    const label = generating ? '正在生成…' : editing ? '重新生成' : '生成笔记'
-
-    return (
-      <div className="flex gap-2">
-        <Button
-          type="submit"
-          className={!editing ? 'w-full' : 'w-2/3' + ' bg-primary'}
-          disabled={generating}
-        >
-          {generating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {label}
-        </Button>
-
-        {editing && (
-          <Button type="button" variant="outline" className="w-1/3" onClick={handleCreateNew}>
-            <Plus className="mr-2 h-4 w-4" />
-            新建笔记
-          </Button>
-        )}
-      </div>
-    )
   }
 
   /* -------------------- 渲染 -------------------- */
@@ -288,73 +257,69 @@ const NoteForm = () => {
     <div className="h-full w-full">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit, onInvalid)} className="space-y-4">
-          {/* 顶部按钮 */}
-          <FormButton></FormButton>
-
-          {/* 视频链接 & 平台 */}
-          <SectionHeader title="视频链接" tip="支持 B 站、YouTube 等平台" />
+          {/* 提交/新建按钮 */}
           <div className="flex gap-2">
-            {/* 平台选择 */}
-
-            <FormField
-              control={form.control}
-              name="platform"
-              render={({ field }) => (
-                <FormItem>
-                  <Select
-                    disabled={!!editing}
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-32">
-                        <SelectValue />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {videoPlatforms?.map(p => (
-                        <SelectItem key={p.value} value={p.value}>
-                          <div className="flex items-center justify-center gap-2">
-                            <div className="h-4 w-4">{p.logo()}</div>
-                            <span>{p.label}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage style={{ display: 'none' }} />
-                </FormItem>
-              )}
-            />
-            {/* 链接输入 / 上传框 */}
-            <FormField
-              control={form.control}
-              name="video_url"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  {platform === 'local' ? (
-                    <>
-                      <Input disabled={!!editing} placeholder="请输入本地视频路径" {...field} />
-                    </>
-                  ) : (
-                    <Input disabled={!!editing} placeholder="请输入视频网站链接" {...field} />
-                  )}
-                  <FormMessage style={{ display: 'none' }} />
-                </FormItem>
-              )}
-            />
+            {editing ? (
+              <>
+                <Button
+                  type="submit"
+                  disabled={generating}
+                  className="flex-1 bg-gradient-to-r from-primary to-indigo-500 text-white shadow-sm hover:shadow-md transition-all"
+                >
+                  {generating && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
+                  <Sparkles className="mr-1.5 h-4 w-4" />
+                  重新生成
+                </Button>
+                <Button type="button" variant="outline" className="shrink-0" onClick={handleCreateNew}>
+                  <Plus className="mr-1 h-4 w-4" />
+                  新建
+                </Button>
+              </>
+            ) : (
+              <Button
+                type="submit"
+                disabled={generating}
+                className="w-full bg-gradient-to-r from-primary to-indigo-500 text-white shadow-sm hover:shadow-md transition-all"
+              >
+                {generating && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
+                <Sparkles className="mr-1.5 h-4 w-4" />
+                {generating ? '正在生成…' : '生成笔记'}
+              </Button>
+            )}
           </div>
 
+          {/* 视频链接 */}
+          <SectionHeader title="视频链接" tip="支持 B 站、YouTube 等平台" />
+
+          {/* 平台图标按钮组 */}
+          <FormField
+            control={form.control}
+            name="platform"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <PlatformIconGroup
+                    value={field.value}
+                    onChange={field.onChange}
+                    disabled={!!editing}
+                  />
+                </FormControl>
+                <FormMessage style={{ display: 'none' }} />
+              </FormItem>
+            )}
+          />
+
+          {/* 链接输入 + 快捷平台选择保留一个平铺 */}
           <FormField
             control={form.control}
             name="video_url"
             render={({ field }) => (
               <FormItem className="flex-1">
-                {platform === 'local' && (
+                {platform === 'local' ? (
                   <>
+                    <Input disabled={!!editing} placeholder="请输入本地视频路径" {...field} />
                     <div
-                      className="hover:border-primary mt-2 flex h-40 cursor-pointer items-center justify-center rounded-md border-2 border-dashed border-gray-300 transition-colors"
+                      className="hover:border-primary mt-2 flex h-32 cursor-pointer items-center justify-center rounded-md border-2 border-dashed border-gray-300 transition-colors"
                       onDragOver={e => {
                         e.preventDefault()
                         e.stopPropagation()
@@ -376,76 +341,73 @@ const NoteForm = () => {
                       }}
                     >
                       {isUploading ? (
-                        <p className="text-center text-sm text-blue-500">上传中，请稍候…</p>
+                        <p className="text-center text-sm text-primary">上传中，请稍候…</p>
                       ) : uploadSuccess ? (
-                        <p className="text-center text-sm text-green-500">上传成功！</p>
+                        <p className="text-center text-sm text-success">上传成功！</p>
                       ) : (
-                        <p className="text-center text-sm text-gray-500">
+                        <p className="text-center text-sm text-muted-foreground">
                           拖拽文件到这里上传 <br />
-                          <span className="text-xs text-gray-400">或点击选择文件</span>
+                          <span className="text-xs text-muted-foreground/60">或点击选择文件</span>
                         </p>
                       )}
                     </div>
                   </>
+                ) : (
+                  <Input disabled={!!editing} placeholder="粘贴视频链接，或选择平台后输入链接" {...field} />
                 )}
-                <FormMessage />
+                <FormMessage style={{ display: 'none' }} />
               </FormItem>
             )}
           />
-          <div className="grid grid-cols-2 gap-2">
-            {/* 模型选择 */}
-            {
 
-             modelList.length>0?(     <FormField
-               className="w-full"
-               control={form.control}
-               name="model_name"
-               render={({ field }) => (
-                 <FormItem>
-                   <SectionHeader title="模型选择" tip="不同模型效果不同，建议自行测试" />
-                   <Select
-                     onOpenChange={()=>{
-                       loadEnabledModels()
-                     }}
-                     value={field.value}
-                     onValueChange={field.onChange}
-                     defaultValue={field.value}
-                   >
-                     <FormControl>
-                       <SelectTrigger className="w-full min-w-0 truncate">
-                         <SelectValue />
-                       </SelectTrigger>
-                     </FormControl>
-                     <SelectContent>
-                       {modelList.map(m => (
-                         <SelectItem key={m.id} value={m.model_name}>
-                           {m.model_name}
-                         </SelectItem>
-                       ))}
-                     </SelectContent>
-                   </Select>
-                   <FormMessage />
-                 </FormItem>
-               )}
-             />): (
-               <FormItem>
-                 <SectionHeader title="模型选择" tip="不同模型效果不同，建议自行测试" />
-                  <Button type={'button'} variant={
-                    'outline'
-                  } onClick={()=>{goModelAdd()}}>请先添加模型</Button>
-                 <FormMessage />
-               </FormItem>
-             )
-            }
+          {/* 模型 + 风格在一行 */}
+          <div className="grid grid-cols-2 gap-3">
+            {modelList.length > 0 ? (
+              <FormField
+                control={form.control}
+                name="model_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <SectionHeader title="模型" tip="不同模型效果不同，建议自行测试" />
+                    <Select
+                      onOpenChange={() => { loadEnabledModels() }}
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-full min-w-0 truncate">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {modelList.map(m => (
+                          <SelectItem key={m.id} value={m.model_name}>
+                            {m.model_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ) : (
+              <FormItem>
+                <SectionHeader title="模型" tip="配置 AI 模型以生成笔记" />
+                <Button type={'button'} variant={'outline'} onClick={goModelAdd} className="w-full">
+                  请先添加模型
+                </Button>
+                <FormMessage />
+              </FormItem>
+            )}
 
-            {/* 笔记风格 */}
             <FormField
-              className="w-full"
               control={form.control}
               name="style"
               render={({ field }) => (
                 <FormItem>
-                  <SectionHeader title="笔记风格" tip="选择生成笔记的呈现风格" />
+                  <SectionHeader title="风格" tip="选择生成笔记的呈现风格" />
                   <Select
                     value={field.value}
                     onValueChange={field.onChange}
@@ -469,107 +431,109 @@ const NoteForm = () => {
               )}
             />
           </div>
-          {/* 视频理解 */}
-          <SectionHeader title="视频理解" tip="将视频截图发给多模态模型辅助分析" />
-          <div className="flex flex-col gap-2">
+
+          {/* ======== 高级选项（折叠） ======== */}
+          <CollapsibleSection title="高级选项">
+            {/* 笔记格式 */}
             <FormField
               control={form.control}
-              name="video_understanding"
+              name="format"
               render={({ field }) => (
                 <FormItem>
-                  <div className="flex items-center gap-2">
-                    <FormLabel>启用</FormLabel>
-                    <Checkbox
-                      checked={videoUnderstandingEnabled}
-                      onCheckedChange={v => form.setValue('video_understanding', v)}
-                    />
-                  </div>
+                  <SectionHeader title="笔记格式" tip="选择要包含的笔记元素" />
+                  <CheckboxGroup
+                    value={field.value}
+                    onChange={field.onChange}
+                    disabledMap={{
+                      link: platform === 'local',
+                      screenshot: !videoUnderstandingEnabled,
+                    }}
+                  />
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <div className="grid grid-cols-2 gap-4">
-              {/* 采样间隔 */}
+            {/* 视频理解 */}
+            <SectionHeader title="视频理解" tip="将视频截图发给多模态模型辅助分析" />
+            <div className="flex flex-col gap-2">
               <FormField
                 control={form.control}
-                name="video_interval"
+                name="video_understanding"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>采样间隔（秒）</FormLabel>
-                    <Input disabled={!videoUnderstandingEnabled} type="number" {...field} />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              {/* 拼图大小 */}
-              <FormField
-                control={form.control}
-                name="grid_size"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>拼图尺寸（列 × 行）</FormLabel>
-                    <div className="flex items-center space-x-2">
-                      <Input
-                        disabled={!videoUnderstandingEnabled}
-                        type="number"
-                        value={field.value?.[0] || 3}
-                        onChange={e => field.onChange([+e.target.value, field.value?.[1] || 3])}
-                        className="w-16"
-                      />
-                      <span>x</span>
-                      <Input
-                        disabled={!videoUnderstandingEnabled}
-                        type="number"
-                        value={field.value?.[1] || 3}
-                        onChange={e => field.onChange([field.value?.[0] || 3, +e.target.value])}
-                        className="w-16"
+                    <div className="flex items-center gap-2">
+                      <FormLabel className="text-xs text-muted-foreground">启用</FormLabel>
+                      <Checkbox
+                        checked={videoUnderstandingEnabled}
+                        onCheckedChange={v => form.setValue('video_understanding', v)}
                       />
                     </div>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            </div>
-            <Alert variant="warning" className="text-sm">
-              <AlertDescription>
-                <strong>提示：</strong>视频理解功能必须使用多模态模型。
-              </AlertDescription>
-            </Alert>
-          </div>
 
-          {/* 笔记格式 */}
-          <FormField
-            control={form.control}
-            name="format"
-            render={({ field }) => (
-              <FormItem>
-                <SectionHeader title="笔记格式" tip="选择要包含的笔记元素" />
-                <CheckboxGroup
-                  value={field.value}
-                  onChange={field.onChange}
-                  disabledMap={{
-                    link: platform === 'local',
-                    screenshot: !videoUnderstandingEnabled,
-                  }}
+              <div className="grid grid-cols-2 gap-3">
+                <FormField
+                  control={form.control}
+                  name="video_interval"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs text-muted-foreground">采样间隔（秒）</FormLabel>
+                      <Input disabled={!videoUnderstandingEnabled} type="number" {...field} className="h-8" />
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                <FormField
+                  control={form.control}
+                  name="grid_size"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs text-muted-foreground">拼图尺寸（列 × 行）</FormLabel>
+                      <div className="flex items-center gap-1">
+                        <Input
+                          disabled={!videoUnderstandingEnabled}
+                          type="number"
+                          value={field.value?.[0] || 3}
+                          onChange={e => field.onChange([+e.target.value, field.value?.[1] || 3])}
+                          className="w-14 h-8"
+                        />
+                        <span className="text-muted-foreground text-xs">x</span>
+                        <Input
+                          disabled={!videoUnderstandingEnabled}
+                          type="number"
+                          value={field.value?.[1] || 3}
+                          onChange={e => field.onChange([field.value?.[0] || 3, +e.target.value])}
+                          className="w-14 h-8"
+                        />
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <Alert variant="warning" className="text-xs py-2">
+                <AlertDescription>
+                  <strong>提示：</strong>视频理解功能必须使用多模态模型。
+                </AlertDescription>
+              </Alert>
+            </div>
 
-          {/* 备注 */}
-          <FormField
-            control={form.control}
-            name="extras"
-            render={({ field }) => (
-              <FormItem>
-                <SectionHeader title="备注" tip="可在 Prompt 结尾附加自定义说明" />
-                <Textarea placeholder="笔记需要罗列出 xxx 关键点…" {...field} />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            {/* 备注 */}
+            <FormField
+              control={form.control}
+              name="extras"
+              render={({ field }) => (
+                <FormItem>
+                  <SectionHeader title="备注" tip="可在 Prompt 结尾附加自定义说明" />
+                  <Textarea placeholder="笔记需要罗列出 xxx 关键点…" {...field} />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CollapsibleSection>
         </form>
       </Form>
     </div>

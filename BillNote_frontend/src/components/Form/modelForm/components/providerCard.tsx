@@ -1,9 +1,9 @@
 import { Switch } from '@/components/ui/switch'
 import { FC } from 'react'
-import styles from './index.module.css'
 import { useNavigate, useParams } from 'react-router-dom'
 import AILogo from '@/components/Form/modelForm/Icons'
 import { useProviderStore } from '@/store/providerStore'
+import { cn } from '@/lib/utils'
 
 export interface IProviderCardProps {
   id: string
@@ -16,12 +16,14 @@ const ProviderCard: FC<IProviderCardProps> = ({
   providerName,
   Icon,
   id,
-}: IProviderCardProps) => {
+}) => {
   const navigate = useNavigate()
   const updateProvider = useProviderStore(state => state.updateProvider)
   const enabled = useProviderStore(state => state.provider.find(p => p.id === id)?.enabled)
 
   const isChecked = enabled === 1
+  const { id: currentId } = useParams()
+  const isActive = currentId === id
 
   const handleToggle = (checked: boolean) => {
     const allProviders = useProviderStore.getState().provider
@@ -33,34 +35,34 @@ const ProviderCard: FC<IProviderCardProps> = ({
     })
   }
 
-  // @ts-ignore
-  const { id: currentId } = useParams()
-  const isActive = currentId === id
-
   return (
     <div
-      className={
-        styles.card +
-        ' flex h-14 cursor-pointer items-center justify-between rounded border border-[#f3f3f3] p-2' +
-        (isActive ? ' bg-[#F0F0F0] font-semibold text-blue-600' : '')
-      }
-      // 整行可点跳转到对应供应商编辑页（之前 onClick 只挂在 icon+名字那一小块 div 上，
-      // 名字和开关之间的空白区域点不动）
       onClick={() => navigate(`/settings/model/${id}`)}
+      className={cn(
+        'flex cursor-pointer flex-col gap-2 rounded-lg border p-3 transition-all hover:shadow-sm',
+        isActive
+          ? 'border-primary/40 bg-primary-lighter shadow-sm'
+          : 'border-border/50 bg-white hover:border-border/80',
+      )}
     >
-      <div className="flex items-center text-lg">
-        <div className="flex h-9 w-9 items-center">
-          <AILogo name={Icon} />
+      {/* 图标 + 开关 */}
+      <div className="flex items-start justify-between">
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-muted/50">
+          <AILogo name={Icon} size={22} />
         </div>
-        <div className="font-semibold">{providerName}</div>
+        <div onClick={e => e.stopPropagation()}>
+          <Switch checked={isChecked} onCheckedChange={handleToggle} />
+        </div>
       </div>
 
-      {/* Switch 自己的点击不应该冒泡触发整行跳转 */}
-      <div onClick={e => e.stopPropagation()}>
-        <Switch
-          checked={isChecked}
-          onCheckedChange={handleToggle}
-        />
+      {/* 名称 */}
+      <div className="text-sm font-medium text-foreground truncate">
+        {providerName}
+      </div>
+
+      {/* 状态标签 */}
+      <div className="text-xs text-muted-foreground/60">
+        {isChecked ? '已启用' : '已禁用'}
       </div>
     </div>
   )

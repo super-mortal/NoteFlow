@@ -6,7 +6,6 @@ import { useCheckBackend } from '@/hooks/useCheckBackend.ts'
 import { systemCheck } from '@/services/system.ts'
 import BackendInitDialog from '@/components/BackendInitDialog'
 import StartupBanner from '@/components/SystemDiagnostic/StartupBanner'
-import BackendHealthIndicator from '@/components/BackendHealth/BackendHealthIndicator'
 import Index from '@/pages/Index.tsx'
 import { HomePage } from './pages/HomePage/Home.tsx'
 
@@ -28,7 +27,7 @@ const AboutPage = lazy(() => import('@/pages/SettingPage/about.tsx'))
 const Monitor = lazy(() => import('@/pages/SettingPage/Monitor.tsx'))
 const Downloader = lazy(() => import('@/pages/SettingPage/Downloader.tsx'))
 const DownloaderForm = lazy(() => import('@/components/Form/DownloaderForm/Form.tsx'))
-const TranscriberPage = lazy(() => import('@/pages/SettingPage/transcriber.tsx'))
+const TranscriberPage = lazy(() => import('@/pages/SettingPage/Transcriber.tsx'))
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'))
 
 function App() {
@@ -65,7 +64,6 @@ function App() {
   return (
     <>
       <StartupBanner />
-      <BackendHealthIndicator />
       <Router>
         <Suspense fallback={<div className="flex h-screen items-center justify-center">加载中…</div>}>
           <Routes>

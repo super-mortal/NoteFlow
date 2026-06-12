@@ -27,13 +27,6 @@ const Menu = () => {
       icon: <HardDriveDownload />,
       path: '/settings/download',
     },
-    // //其他配置
-    // {
-    //   id: 'prompt',
-    //   name: '提示词设置',
-    //   icon: <SquareChevronRight />,
-    //   path: '/settings/prompt',
-    // },
     {
       id: 'monitor',
       name: '部署监控',
@@ -46,24 +39,17 @@ const Menu = () => {
       icon: <Info />,
       path: '/settings/about',
     },
-    // {
-    //   id: 'other',
-    //   name: '其他配置',
-    //   icon: <Wrench />,
-    //   path: '/settings/other',
-    // },
   ]
   return (
-    <div className="flex h-full flex-col">
-      <div className={'flex w-full flex-col gap-2'}>
-        <div className="text-2xl font-medium">设置</div>
-        <div className="text-sm font-light text-gray-800">全局配置与模型设置</div>
+    <div className="flex h-full flex-col gap-1">
+      <div className="px-3 pb-3 border-b border-border/50">
+        <h2 className="text-lg font-semibold">设置</h2>
+        <p className="text-xs text-muted-foreground/70 mt-0.5">全局配置与模型管理</p>
       </div>
-      <div className="mt-6 flex-1">
-        {menuList &&
-          menuList.map(item => {
-            return <MenuBar key={item.id} menuItem={item} />
-          })}
+      <div className="flex-1 pt-2 space-y-0.5">
+        {menuList?.map(item => (
+          <MenuBar key={item.id} menuItem={item} />
+        ))}
       </div>
     </div>
   )

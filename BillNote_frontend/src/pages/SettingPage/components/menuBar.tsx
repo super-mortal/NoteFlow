@@ -1,6 +1,6 @@
-import styles from './index.module.css'
 import { FC, JSX } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { cn } from '@/lib/utils'
 
 export interface IMenuProps {
   id: string
@@ -13,22 +13,28 @@ interface IMenuItem {
   menuItem: IMenuProps
 }
 
-const MenuBar: ({ menuItem }: { menuItem: any }) => JSX.Element = ({ menuItem }) => {
+const MenuBar: FC<IMenuItem> = ({ menuItem }) => {
   const location = useLocation()
   const isActive =
     location.pathname.startsWith(menuItem.path + '/') || location.pathname === menuItem.path
 
   return (
-    <Link to={menuItem.path} className="w-full">
+    <Link to={menuItem.path} className="block">
       <div
-        className={
-          styles.menuBar +
-          ' flex h-12 w-full items-center gap-1 rounded px-2' +
-          (isActive ? ' bg-[#F0F0F0] font-semibold text-blue-600' : '')
-        }
+        className={cn(
+          'relative flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium transition-all',
+          isActive
+            ? 'bg-primary-light text-primary'
+            : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+        )}
       >
-        <div className="h-6 w-6">{menuItem.icon}</div>
-        <div className="text-[16px]">{menuItem.name}</div>
+        {/* 活跃指示条 */}
+        {isActive && (
+          <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r-full bg-primary" />
+        )}
+
+        <span className="h-5 w-5 shrink-0">{menuItem.icon}</span>
+        <span>{menuItem.name}</span>
       </div>
     </Link>
   )

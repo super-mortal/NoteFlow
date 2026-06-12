@@ -101,6 +101,10 @@ Load unpacked at `chrome://extensions/` → select `BillNote_extension/extension
 - **Vite proxy**: Dev server proxies `/api` and `/static` to backend (configured in `vite.config.ts`, reads env from parent dir; falls back to current dir when `DOCKER_BUILD` is set)
 - **CORS**: `backend/main.py` uses a regex (`CORS_ORIGIN_REGEX`) that allows localhost, `tauri.localhost`, and `chrome-extension://` / `moz-extension://` origins — required for the desktop app and the browser extension.
 
+## Changelog / 更新日志
+
+更新日志按主版本号分组归档在 `docs/changelog/` 下（如 `V0.x.x.md`、`V1.x.x.md`），详细书写规范请阅读 [`docs/changelog/CLAUDE.md`](docs/changelog/CLAUDE.md)。
+
 ## Code Style
 
 - **Frontend**: ESLint + Prettier (2 spaces, single quotes, 100 char width, Tailwind plugin). TypeScript strict mode.

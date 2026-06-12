@@ -1,7 +1,5 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-
-@custom-variant dark (&:is(.dark *));
 html, body, #root {
   height: 100%;
   overflow: hidden;
@@ -38,7 +36,8 @@ html, body, #root {
   --popover-foreground: oklch(0.145 0 0);
   --primary: #3c77fb;
   --primary-light: #e0eeff;
-  --primary-foreground: oklch(0.985 0 0);
+  --primary-lighter: #f0f6ff;
+  --primary-foreground: #ffffff;
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
@@ -46,7 +45,7 @@ html, body, #root {
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: var(    --color-neutral-200);
+  --border: var(--color-neutral-200);
   --input: oklch(0.922 0 0);
   --ring: #096dd9;
   --chart-1: oklch(0.646 0.222 41.116);
@@ -62,41 +61,29 @@ html, body, #root {
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
-}
 
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: #3c77fb;
-  --primary-light: #e0eeff;
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: #e6f7ff;
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* 新增：表面层级 */
+  --surface-card: #ffffff;
+  --surface-muted: #f8fafc;
+  --surface-sidebar: #fafbfc;
+  --surface-navbar: rgba(255, 255, 255, 0.85);
+
+  /* 新增：品牌渐变 */
+  --gradient-primary: linear-gradient(135deg, #3c77fb 0%, #6366f1 100%);
+  --gradient-hero: linear-gradient(180deg, #f0f6ff 0%, #ffffff 100%);
+
+  /* 新增：语义色 */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+
+  /* 新增：文字层级 */
+  --text-secondary: #64748b;
+  --text-tertiary: #94a3b8;
+
+  /* 新增：流水线指示色 */
+  --pipeline-line: #e0eeff;
+  --pipeline-active: #3c77fb;
 }
 
 @theme inline {
@@ -112,6 +99,7 @@ html, body, #root {
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-light: var(--primary-light);
+  --color-primary-lighter: var(--primary-lighter);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
@@ -136,6 +124,17 @@ html, body, #root {
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* 新增：暴露新变量给 tailwind */
+  --color-surface-card: var(--surface-card);
+  --color-surface-muted: var(--surface-muted);
+  --color-surface-sidebar: var(--surface-sidebar);
+  --color-surface-navbar: var(--surface-navbar);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-tertiary: var(--text-tertiary);
 }
 
 @layer base {
@@ -145,4 +144,35 @@ html, body, #root {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* 自定义动画 */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.3s ease-out;
+}
+
+.animate-scale-in {
+  animation: scale-in 0.2s ease-out;
 }

@@ -6,7 +6,6 @@ import { toast } from 'react-hot-toast'
 import Error from '@/components/Lottie/error.tsx'
 import Loading from '@/components/Lottie/Loading.tsx'
 import Idle from '@/components/Lottie/Idle.tsx'
-import StepBar from '@/pages/HomePage/components/StepBar.tsx'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { atomDark as codeStyle } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import Zoom from 'react-medium-image-zoom'
@@ -20,11 +19,13 @@ import 'github-markdown-css/github-markdown-light.css'
 import { ScrollArea } from '@/components/ui/scroll-area.tsx'
 import { useTaskStore } from '@/store/taskStore'
 import { noteStyles } from '@/constant/note.ts'
-import { MarkdownHeader } from '@/pages/HomePage/components/MarkdownHeader.tsx'
 import TranscriptViewer from '@/pages/HomePage/components/transcriptViewer.tsx'
 import MarkmapEditor from '@/pages/HomePage/components/MarkmapComponent.tsx'
 import ChatPanel from '@/pages/HomePage/components/ChatPanel.tsx'
 import VideoBanner from '@/pages/HomePage/components/VideoBanner.tsx'
+import StatusBadge from '@/components/StatusBadge'
+import PipelineProgress from '@/components/PipelineProgress'
+import ViewTabs, { ViewTabId, DEFAULT_TABS } from '@/components/ViewTabs'
 
 interface VersionNote {
   ver_id: string
@@ -39,7 +40,7 @@ interface MarkdownViewerProps {
   status: 'idle' | 'loading' | 'success' | 'failed'
 }
 
-const steps = [
+const pipelineSteps = [
   { label: '解析链接', key: 'PARSING' },
   { label: '下载音频', key: 'DOWNLOADING' },
   { label: '转写文字', key: 'TRANSCRIBING' },
@@ -52,7 +53,6 @@ const rehypePlugins = [rehypeKatex, rehypeSlug]
 
 /**
  * 构建 ReactMarkdown components 对象，baseURL 用于修正图片路径。
- * 使用函数 + useMemo 避免每次渲染都创建新的函数实例。
  */
 function createMarkdownComponents(baseURL: string) {
   return {
@@ -118,18 +118,11 @@ function createMarkdownComponents(baseURL: string) {
         )
       }
 
-      // 处理笔记内部锚点链接（如目录跳转）
       if (href?.startsWith('#')) {
         const handleAnchorClick = (e: React.MouseEvent) => {
           e.preventDefault()
           const id = decodeURIComponent(href.slice(1))
-
-          // 1. 优先精确匹配 id
           let target = document.getElementById(id)
-
-          // 2. 精确失败时按 heading 文本模糊匹配
-          // LLM 生成的目录锚点可能和 heading 实际文本不完全一致
-          //（例如 heading 带 *Content-[00:00]* 后缀，目录链接里没有）
           if (!target) {
             const normalize = (s: string) =>
               s.replace(/[-：:\s*\[\]]/g, '').toLowerCase()
@@ -143,7 +136,6 @@ function createMarkdownComponents(baseURL: string) {
               }
             }
           }
-
           if (target) {
             target.scrollIntoView({ behavior: 'smooth', block: 'start' })
           } else {
@@ -320,7 +312,7 @@ const MarkdownViewer: FC<MarkdownViewerProps> = memo(({ status }) => {
   const [modelName, setModelName] = useState<string>('')
   const [style, setStyle] = useState<string>('')
   const [createTime, setCreateTime] = useState<string>('')
-  // 确保baseURL没有尾部斜杠
+  const [viewTab, setViewTab] = useState<ViewTabId>('markdown')
   const baseURL = (String(import.meta.env.VITE_API_BASE_URL || '').replace('/api','') || '').replace(/\/$/, '')
   const getCurrentTask = useTaskStore.getState().getCurrentTask
   const currentTask = useTaskStore(state => state.getCurrentTask())
@@ -340,7 +332,7 @@ const MarkdownViewer: FC<MarkdownViewerProps> = memo(({ status }) => {
     if (!currentTask) return
 
     if (!isMultiVersion) {
-      setCurrentVerId('') // 清空旧版本 ID
+      setCurrentVerId('')
       setModelName(currentTask.formData.model_name)
       setStyle(currentTask.formData.style)
       setCreateTime(currentTask.createdAt)
@@ -366,6 +358,7 @@ const MarkdownViewer: FC<MarkdownViewerProps> = memo(({ status }) => {
       setSelectedContent(currentVer.content)
     }
   }, [currentVerId, currentTask?.id])
+
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(selectedContent)
@@ -376,33 +369,7 @@ const MarkdownViewer: FC<MarkdownViewerProps> = memo(({ status }) => {
       toast.error('复制失败')
     }
   }
-  const alertButton = {
-    id: 'alert',
-    title: '测试警告',
-    content: '⚠️',
-    onClick: () => alert('你点击了自定义按钮！'),
-  }
-  const exportButton = {
-    id: 'export',
-    title: '导出思维导图',
-    content: '⤓',
-    onClick: () => {
-      const svgEl = svgRef.current
-      if (!svgEl) return
-      // 同上面的序列化逻辑
-      const serializer = new XMLSerializer()
-      const source = serializer.serializeToString(svgEl)
-      const blob = new Blob(['<?xml version="1.0" encoding="UTF-8"?>', source], {
-        type: 'image/svg+xml;charset=utf-8',
-      })
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = 'mindmap.svg'
-      a.click()
-      URL.revokeObjectURL(url)
-    },
-  }
+
   const handleDownload = () => {
     const task = getCurrentTask()
     const name = task?.audioMeta.title || 'note'
@@ -415,14 +382,24 @@ const MarkdownViewer: FC<MarkdownViewerProps> = memo(({ status }) => {
     document.body.removeChild(link)
   }
 
+  /** 同步 viewTab → viewMode 兼容逻辑 */
+  useEffect(() => {
+    if (viewTab === 'mindmap') {
+      setViewMode('map')
+    } else {
+      setViewMode('preview')
+    }
+  }, [viewTab])
+
+  // ========== 状态渲染 ==========
+
   if (status === 'loading') {
     return (
-      <div className="flex h-screen w-full flex-col items-center justify-center space-y-4 text-neutral-500">
-        <StepBar steps={steps} currentStep={taskStatus} />
-        <Loading className="h-5 w-5" />
-        <div className="text-center text-sm">
-          <p className="text-lg font-bold">正在生成笔记，请稍候…</p>
-          <p className="mt-2 text-xs text-neutral-500">这可能需要几秒钟时间，取决于视频长度</p>
+      <div className="flex h-full w-full flex-col items-center justify-center space-y-6 text-muted-foreground">
+        <PipelineProgress steps={pipelineSteps} currentStep={taskStatus} />
+        <div className="text-center">
+          <p className="text-sm text-muted-foreground/70">正在生成笔记，请稍候…</p>
+          <p className="mt-1 text-xs text-muted-foreground/50">这可能需要几秒钟时间，取决于视频长度</p>
         </div>
       </div>
     )
@@ -430,11 +407,21 @@ const MarkdownViewer: FC<MarkdownViewerProps> = memo(({ status }) => {
 
   if (status === 'idle') {
     return (
-      <div className="flex h-screen w-full flex-col items-center justify-center space-y-3 text-neutral-500">
+      <div className="flex h-full w-full flex-col items-center justify-center space-y-5 text-muted-foreground">
         <Idle />
         <div className="text-center">
-          <p className="text-lg font-bold">输入视频链接并点击"生成笔记"</p>
-          <p className="mt-2 text-xs text-neutral-500">支持哔哩哔哩、YouTube 、抖音等视频平台</p>
+          <p className="text-lg font-bold">从一条链接，到一篇结构化笔记</p>
+          <p className="mt-2 text-sm text-muted-foreground/70">粘贴视频链接，AI 自动完成</p>
+        </div>
+        <div className="flex items-center gap-4 text-center">
+          {[{ label: '解析元数据' }, { label: '提取音频' }, { label: '语音转文字' }, { label: 'AI 分析' }, { label: '生成笔记' }].map((step, i) => (
+            <div key={i} className="flex flex-col items-center gap-1">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-light text-primary text-xs font-bold">
+                {i + 1}
+              </div>
+              <span className="text-xs text-muted-foreground/60">{step.label}</span>
+            </div>
+          ))}
         </div>
       </div>
     )
@@ -442,12 +429,11 @@ const MarkdownViewer: FC<MarkdownViewerProps> = memo(({ status }) => {
 
   if (status === 'failed' && !isMultiVersion) {
     return (
-      <div className="flex h-screen w-full flex-col items-center justify-center gap-4 space-y-3">
+      <div className="flex h-full w-full flex-col items-center justify-center gap-4">
         <Error />
         <div className="text-center">
           <p className="text-lg font-bold text-red-500">笔记生成失败</p>
-          <p className="mt-2 mb-2 text-xs text-red-400">请检查后台或稍后再试</p>
-
+          <p className="mt-2 mb-4 text-xs text-red-400">请检查后台或稍后再试</p>
           <Button onClick={() => retryTask(currentTask.id)} size="lg">
             重试
           </Button>
@@ -456,92 +442,137 @@ const MarkdownViewer: FC<MarkdownViewerProps> = memo(({ status }) => {
     )
   }
 
-  return (
-    <div className="flex h-screen w-full flex-col overflow-hidden">
-      <MarkdownHeader
-        currentTask={currentTask}
-        isMultiVersion={isMultiVersion}
-        currentVerId={currentVerId}
-        setCurrentVerId={setCurrentVerId}
-        modelName={modelName}
-        style={style}
-        noteStyles={noteStyles}
-        onCopy={handleCopy}
-        onDownload={handleDownload}
-        createAt={createTime}
-        showTranscribe={showTranscribe}
-        setShowTranscribe={setShowTranscribe}
-        showChat={showChat}
-        setShowChat={setShowChat}
-        viewMode={viewMode}
-        setViewMode={setViewMode}
-      />
+  const hasContent = selectedContent && selectedContent !== 'loading' && selectedContent !== 'empty'
 
-      {viewMode === 'map' ? (
-        <div className="flex w-full flex-1 overflow-hidden bg-white">
-          <div className={'w-full'}>
-            <MarkmapEditor
-              value={selectedContent}
-              onChange={() => {}}
-              height="100%" // 根据需求可以设定百分比或固定高度
-              title={currentTask?.audioMeta?.title || '思维导图'}
-            />
-          </div>
-        </div>
-      ) : (
-        <div className="flex flex-1 overflow-hidden bg-white py-2">
-          {selectedContent && selectedContent !== 'loading' && selectedContent !== 'empty' ? (
+  return (
+    <div className="flex h-full w-full flex-col overflow-hidden">
+      {/* 操作栏: 视图切换 + 操作按钮 */}
+      <div className="sticky top-0 z-10 flex flex-wrap items-center justify-between gap-2 border-b border-border/50 bg-white/95 px-4 py-2 backdrop-blur-sm">
+        <ViewTabs
+          activeTab={viewTab}
+          onChange={setViewTab}
+        />
+
+        <div className="flex items-center gap-1">
+          {/* 版本选择 */}
+          {isMultiVersion && hasContent && (
+            <select
+              className="h-7 rounded-md border border-border/50 bg-muted px-2 text-xs text-muted-foreground"
+              value={currentVerId}
+              onChange={e => setCurrentVerId(e.target.value)}
+            >
+              {(currentTask?.markdown || []).map((v: any) => (
+                <option key={v.ver_id} value={v.ver_id}>
+                  版本 {v.ver_id?.slice(-6)}
+                </option>
+              ))}
+            </select>
+          )}
+
+          {hasContent && (
             <>
-              {showChat === 'full' && currentTask ? (
-                <div className="h-full w-full">
-                  <ChatPanel taskId={currentTask.id} mode="full" onModeChange={setShowChat} />
-                </div>
-              ) : (
-              <>
-              <ScrollArea className="min-w-0 flex-1">
-                <div className="px-2">
-                  <VideoBanner
-                    audioMeta={currentTask?.audioMeta}
-                    videoUrl={currentTask?.formData?.video_url}
-                  />
-                </div>
-                <div className={'markdown-body w-full px-2'}>
-                  <ReactMarkdown
-                    remarkPlugins={remarkPlugins}
-                    rehypePlugins={rehypePlugins}
-                    components={markdownComponents}
-                  >
-                    {selectedContent.replace(/^>\s*来源链接：[^\n]*\n*/m, '')}
-                  </ReactMarkdown>
-                </div>
-              </ScrollArea>
-              {showTranscribe && (
-                <div className={'ml-2 w-2/4'}>
-                  <TranscriptViewer />
-                </div>
-              )}
-              {/* 侧边问答模式：markdown + ChatPanel 各占一半 */}
-              {showChat === 'half' && currentTask && (
-                <div className="ml-2 h-full w-1/2 shrink-0">
-                  <ChatPanel taskId={currentTask.id} mode="half" onModeChange={setShowChat} />
-                </div>
-              )}
-              </>
-              )}
+              <span className="hidden md:flex items-center gap-1.5">
+                <StatusBadge variant="info" label={modelName} />
+                <StatusBadge variant="neutral" label={noteStyles.find(s => s.value === style)?.label || style} />
+              </span>
+              <button
+                onClick={handleCopy}
+                className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+              >
+                <Copy className="h-3.5 w-3.5" />
+                {copied ? '已复制' : '复制'}
+              </button>
+              <button
+                onClick={handleDownload}
+                className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+              >
+                <Download className="h-3.5 w-3.5" />
+                导出
+              </button>
+              <button
+                onClick={() => setShowTranscribe(!showTranscribe)}
+                className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+              >
+                原文参照
+              </button>
+              <button
+                onClick={() => setShowChat(showChat ? false : 'half')}
+                className={`flex items-center gap-1 rounded-md px-2 py-1 text-xs transition-colors ${
+                  showChat ? 'bg-primary text-white' : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                }`}
+              >
+                AI 问答
+              </button>
             </>
-          ) : (
-            <div className="flex h-full w-full items-center justify-center">
-              <div className="w-[300px] flex-col justify-items-center">
-                <div className="bg-primary-light mb-4 flex h-16 w-16 items-center justify-center rounded-full">
-                  <ArrowRight className="text-primary h-8 w-8" />
-                </div>
-                <p className="mb-2 text-neutral-600">输入视频链接并点击"生成笔记"按钮</p>
-                <p className="text-xs text-neutral-500">支持哔哩哔哩、YouTube等视频网站</p>
-              </div>
-            </div>
           )}
         </div>
-      )}
+      </div>
+
+      {/* ======== 内容区 ======== */}
+      <div className="flex flex-1 overflow-hidden">
+        {hasContent ? (
+          <>
+            {viewTab === 'mindmap' ? (
+              <div className="flex w-full flex-1 overflow-hidden">
+                <MarkmapEditor
+                  value={selectedContent}
+                  onChange={() => {}}
+                  height="100%"
+                  title={currentTask?.audioMeta?.title || '思维导图'}
+                />
+              </div>
+            ) : (
+              <>
+                {showChat === 'full' && currentTask ? (
+                  <div className="h-full w-full">
+                    <ChatPanel taskId={currentTask.id} mode="full" onModeChange={setShowChat} />
+                  </div>
+                ) : (
+                  <>
+                    <ScrollArea className="min-w-0 flex-1">
+                      <div className="px-2 pt-1">
+                        <VideoBanner
+                          audioMeta={currentTask?.audioMeta}
+                          videoUrl={currentTask?.formData?.video_url}
+                        />
+                      </div>
+                      <div className='markdown-body w-full px-2'>
+                        <ReactMarkdown
+                          remarkPlugins={remarkPlugins}
+                          rehypePlugins={rehypePlugins}
+                          components={markdownComponents}
+                        >
+                          {selectedContent.replace(/^>\s*来源链接：[^\n]*\n*/m, '')}
+                        </ReactMarkdown>
+                      </div>
+                    </ScrollArea>
+                    {showTranscribe && (
+                      <div className={'ml-2 w-2/4'}>
+                        <TranscriptViewer />
+                      </div>
+                    )}
+                    {showChat === 'half' && currentTask && (
+                      <div className="ml-2 h-full w-1/2 shrink-0">
+                        <ChatPanel taskId={currentTask.id} mode="half" onModeChange={setShowChat} />
+                      </div>
+                    )}
+                  </>
+                )}
+              </>
+            )}
+          </>
+        ) : (
+          <div className="flex h-full w-full items-center justify-center">
+            <div className="w-[300px] flex-col justify-items-center">
+              <div className="bg-primary-light mb-4 flex h-16 w-16 items-center justify-center rounded-full">
+                <ArrowRight className="text-primary h-8 w-8" />
+              </div>
+              <p className="mb-2 text-muted-foreground">输入视频链接并点击"生成笔记"按钮</p>
+              <p className="text-xs text-muted-foreground/60">支持哔哩哔哩、YouTube等视频网站</p>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 })

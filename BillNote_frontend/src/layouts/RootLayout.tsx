@@ -1,5 +1,4 @@
 import type { ReactNode, FC } from 'react'
-// import "@/global.css"
 import { Toaster } from 'react-hot-toast'
 
 interface RootLayoutProps {
@@ -13,9 +12,9 @@ export const metadata = {
 
 const RootLayout: FC<RootLayoutProps> = ({ children }) => {
   return (
-    <div className="min-h-screen bg-neutral-100 font-sans text-neutral-900">
+    <div className="flex h-screen flex-col bg-muted font-sans text-foreground">
       <Toaster
-        position="top-center" // 顶部居中显示
+        position="top-center"
         toastOptions={{
           style: {
             borderRadius: '8px',
@@ -24,7 +23,9 @@ const RootLayout: FC<RootLayoutProps> = ({ children }) => {
           },
         }}
       />
-      {children}
+      <main className="flex-1 overflow-hidden">
+        {children}
+      </main>
     </div>
   )
 }
