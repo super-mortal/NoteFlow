@@ -1,34 +1,46 @@
 import ProviderCard from '@/components/Form/DownloaderForm/providerCard.tsx'
-import { Button } from '@/components/ui/button.tsx'
-import { useProviderStore } from '@/store/providerStore'
-import { useNavigate } from 'react-router-dom'
-import { DouyinLogo, KuaishouLogo } from '@/components/Icons/platform.tsx'
+import { useEffect, useState } from 'react'
+import { getDownloaderCookie } from '@/services/downloader'
 import { videoPlatforms } from '@/constant/note.ts'
 
-const Provider = () => {
-  const navigate = useNavigate()
-  const handleClick = () => {
-    navigate(`/settings/model/new`)
-  }
+const Options = () => {
+  const [cookieMap, setCookieMap] = useState<Record<string, boolean>>({})
+
+  useEffect(() => {
+    const fetchAll = async () => {
+      const map: Record<string, boolean> = {}
+      for (const p of videoPlatforms) {
+        if (p.value === 'local') continue
+        try {
+          const res = await getDownloaderCookie(p.value)
+          map[p.value] = !!res?.cookie
+        } catch {
+          map[p.value] = false
+        }
+      }
+      setCookieMap(map)
+    }
+    fetchAll()
+  }, [])
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="text-sm font-light">下载器配置</div>
-      <div>
-        {videoPlatforms &&
-          videoPlatforms.map((provider, index) => {
-            if (provider.value !== 'local')
-              return (
-                <ProviderCard
-                  key={index}
-                  providerName={provider.label}
-                  Icon={provider?.logo}
-                  id={provider.value}
-                />
-              )
-          })}
+    <div className="flex flex-col gap-3">
+      <div className="text-xs font-medium text-text-secondary">选择平台</div>
+      <div className="grid grid-cols-1 gap-2.5">
+        {videoPlatforms
+          .filter(p => p.value !== 'local')
+          .map((provider, index) => (
+            <ProviderCard
+              key={index}
+              providerName={provider.label}
+              Icon={provider.logo}
+              id={provider.value}
+              hasCookie={cookieMap[provider.value]}
+            />
+          ))}
       </div>
     </div>
   )
 }
-export default Provider
+
+export default Options

@@ -105,6 +105,8 @@ Load unpacked at `chrome://extensions/` → select `BillNote_extension/extension
 
 更新日志按主版本号分组归档在 `docs/changelog/` 下（如 `V0.x.x.md`、`V1.x.x.md`），详细书写规范请阅读 [`docs/changelog/CLAUDE.md`](docs/changelog/CLAUDE.md)。
 
+**重要规则**：仅在用户明确发出"写入更新日志"或"更新 changelog"等指令时，才写入更新日志。不要在执行代码修改后自动写入，等待用户主动要求。
+
 ## Code Style
 
 - **Frontend**: ESLint + Prettier (2 spaces, single quotes, 100 char width, Tailwind plugin). TypeScript strict mode.
