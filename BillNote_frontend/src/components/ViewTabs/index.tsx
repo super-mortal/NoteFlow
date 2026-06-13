@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils.ts'
 
-export type ViewTabId = 'markdown' | 'timeline' | 'summary' | 'mindmap'
+export type ViewTabId = 'markdown' | 'mindmap'
 
 interface ViewTab {
   id: ViewTabId
@@ -17,9 +17,7 @@ interface ViewTabsProps {
 
 const DEFAULT_TABS: ViewTab[] = [
   { id: 'markdown', label: 'Markdown' },
-  { id: 'timeline', label: '时间轴' },
-  { id: 'summary', label: 'AI 摘要' },
-  { id: 'mindmap', label: '导图' },
+  { id: 'mindmap', label: '思维导图' },
 ]
 
 const ViewTabs = ({ tabs = DEFAULT_TABS, activeTab, onChange, className }: ViewTabsProps) => {

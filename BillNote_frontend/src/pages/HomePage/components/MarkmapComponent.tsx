@@ -545,8 +545,30 @@ export default function MarkmapEditor({
     const mm = mmRef.current
     if (!mm) return
     const { root } = transformMindmap(value)
-    mm.setData(root).then(() => mm.fit())
+    mm.setData(root).then(() => {
+      // 等待 layout 稳定后再 fit
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          mm.fit()
+        })
+      })
+    })
   }, [value])
+
+  // 使用 ResizeObserver 监听容器尺寸变化，自动 re-fit 思维导图
+  useEffect(() => {
+    const svgEl = svgRef.current
+    if (!svgEl) return
+    const parent = svgEl.parentElement
+    if (!parent) return
+
+    const observer = new ResizeObserver(() => {
+      mmRef.current?.fit()
+    })
+    observer.observe(parent)
+
+    return () => observer.disconnect()
+  }, [])
 
   // 文本输入变化回调（如果你自行添加 textarea 编辑区）
   // const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -554,7 +576,7 @@ export default function MarkmapEditor({
   // }
 
   return (
-    <div className="relative flex h-full flex-col bg-white">
+    <div className="relative flex h-full w-full flex-col bg-white" style={{ minHeight: 0 }}>
       {/* 全屏/退出全屏 按钮 */}
       <div className="absolute top-2 right-2 z-20 flex space-x-2">
         <button
@@ -618,7 +640,7 @@ export default function MarkmapEditor({
       {/* <textarea value={value} onChange={handleChange} className="mb-2 p-2 border rounded" /> */}
 
       {/* 思维导图区 */}
-      <svg ref={svgRef} className="w-full flex-1" style={{ height, overflow: 'auto' }} />
+      <svg ref={svgRef} className="w-full flex-1" style={{ overflow: 'auto' }} />
 
       {/* 如果你还想保留 markmap-toolbar */}
       {/* <div ref={toolbarRef} className="absolute right-2 bottom-2 z-10" /> */}

@@ -1,5 +1,4 @@
 import { FC } from 'react'
-import { ScrollArea } from "@/components/ui/scroll-area.tsx"
 import SidePanel from '@/components/SidePanel'
 
 interface IProps {
@@ -22,13 +21,9 @@ const HomeLayout: FC<IProps> = ({ NoteForm, Preview, History }) => {
           />
         </div>
 
-        {/* 主内容区 */}
+        {/* 主内容区 — 移除 ScrollArea 外包装，让 MarkdownViewer 自行管理滚动 */}
         <main className="flex min-w-0 flex-1 flex-col overflow-hidden bg-white animate-fade-in-up">
-          <ScrollArea className="h-full">
-            <div className="p-6">
-              {Preview}
-            </div>
-          </ScrollArea>
+          {Preview}
         </main>
       </div>
     </div>

@@ -26,6 +26,7 @@ import VideoBanner from '@/pages/HomePage/components/VideoBanner.tsx'
 import StatusBadge from '@/components/StatusBadge'
 import PipelineProgress from '@/components/PipelineProgress'
 import ViewTabs, { ViewTabId, DEFAULT_TABS } from '@/components/ViewTabs'
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable.tsx'
 
 interface VersionNote {
   ver_id: string
@@ -490,13 +491,21 @@ const MarkdownViewer: FC<MarkdownViewerProps> = memo(({ status }) => {
                 导出
               </button>
               <button
-                onClick={() => setShowTranscribe(!showTranscribe)}
-                className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+                onClick={() => {
+                  setShowTranscribe(!showTranscribe)
+                  if (!showTranscribe) setShowChat(false)
+                }}
+                className={`flex items-center gap-1 rounded-md px-2 py-1 text-xs transition-colors ${
+                  showTranscribe ? 'bg-primary text-white' : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                }`}
               >
                 原文参照
               </button>
               <button
-                onClick={() => setShowChat(showChat ? false : 'half')}
+                onClick={() => {
+                  setShowChat(showChat ? false : 'half')
+                  if (!showChat) setShowTranscribe(false)
+                }}
                 className={`flex items-center gap-1 rounded-md px-2 py-1 text-xs transition-colors ${
                   showChat ? 'bg-primary text-white' : 'text-muted-foreground hover:bg-accent hover:text-foreground'
                 }`}
@@ -517,7 +526,6 @@ const MarkdownViewer: FC<MarkdownViewerProps> = memo(({ status }) => {
                 <MarkmapEditor
                   value={selectedContent}
                   onChange={() => {}}
-                  height="100%"
                   title={currentTask?.audioMeta?.title || '思维导图'}
                 />
               </div>
@@ -529,32 +537,57 @@ const MarkdownViewer: FC<MarkdownViewerProps> = memo(({ status }) => {
                   </div>
                 ) : (
                   <>
-                    <ScrollArea className="min-w-0 flex-1">
-                      <div className="px-2 pt-1">
-                        <VideoBanner
-                          audioMeta={currentTask?.audioMeta}
-                          videoUrl={currentTask?.formData?.video_url}
-                        />
-                      </div>
-                      <div className='markdown-body w-full px-2'>
-                        <ReactMarkdown
-                          remarkPlugins={remarkPlugins}
-                          rehypePlugins={rehypePlugins}
-                          components={markdownComponents}
-                        >
-                          {selectedContent.replace(/^>\s*来源链接：[^\n]*\n*/m, '')}
-                        </ReactMarkdown>
-                      </div>
-                    </ScrollArea>
-                    {showTranscribe && (
-                      <div className={'ml-2 w-2/4'}>
-                        <TranscriptViewer />
-                      </div>
-                    )}
-                    {showChat === 'half' && currentTask && (
-                      <div className="ml-2 h-full w-1/2 shrink-0">
-                        <ChatPanel taskId={currentTask.id} mode="half" onModeChange={setShowChat} />
-                      </div>
+                    {showChat === 'half' && currentTask ? (
+                      <ResizablePanelGroup direction="horizontal" className="flex-1 overflow-hidden">
+                        <ResizablePanel defaultSize={75} minSize={40}>
+                          <div className="h-full overflow-y-auto">
+                            <div className="px-2 pt-1">
+                              <VideoBanner
+                                audioMeta={currentTask?.audioMeta}
+                                videoUrl={currentTask?.formData?.video_url}
+                              />
+                            </div>
+                            <div className='markdown-body w-full px-2'>
+                              <ReactMarkdown
+                                remarkPlugins={remarkPlugins}
+                                rehypePlugins={rehypePlugins}
+                                components={markdownComponents}
+                              >
+                                {selectedContent.replace(/^>\s*来源链接：[^\n]*\n*/m, '')}
+                              </ReactMarkdown>
+                            </div>
+                          </div>
+                        </ResizablePanel>
+                        <ResizableHandle withHandle />
+                        <ResizablePanel defaultSize={25} maxSize={40} minSize={15}>
+                          <ChatPanel taskId={currentTask.id} mode="half" onModeChange={setShowChat} />
+                        </ResizablePanel>
+                      </ResizablePanelGroup>
+                    ) : (
+                      <>
+                        <ScrollArea className="min-w-0 flex-1">
+                          <div className="px-2 pt-1">
+                            <VideoBanner
+                              audioMeta={currentTask?.audioMeta}
+                              videoUrl={currentTask?.formData?.video_url}
+                            />
+                          </div>
+                          <div className='markdown-body w-full px-2'>
+                            <ReactMarkdown
+                              remarkPlugins={remarkPlugins}
+                              rehypePlugins={rehypePlugins}
+                              components={markdownComponents}
+                            >
+                              {selectedContent.replace(/^>\s*来源链接：[^\n]*\n*/m, '')}
+                            </ReactMarkdown>
+                          </div>
+                        </ScrollArea>
+                        {showTranscribe && (
+                          <div className="ml-2 w-2/4">
+                            <TranscriptViewer />
+                          </div>
+                        )}
+                      </>
                     )}
                   </>
                 )}
