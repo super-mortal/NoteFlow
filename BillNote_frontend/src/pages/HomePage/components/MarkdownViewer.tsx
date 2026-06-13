@@ -563,6 +563,32 @@ const MarkdownViewer: FC<MarkdownViewerProps> = memo(({ status }) => {
                           <ChatPanel taskId={currentTask.id} mode="half" onModeChange={setShowChat} />
                         </ResizablePanel>
                       </ResizablePanelGroup>
+                    ) : showTranscribe ? (
+                      <ResizablePanelGroup direction="horizontal" className="flex-1 overflow-hidden">
+                        <ResizablePanel defaultSize={70} minSize={40}>
+                          <ScrollArea className="min-w-0 flex-1">
+                            <div className="px-2 pt-1">
+                              <VideoBanner
+                                audioMeta={currentTask?.audioMeta}
+                                videoUrl={currentTask?.formData?.video_url}
+                              />
+                            </div>
+                            <div className='markdown-body w-full px-2'>
+                              <ReactMarkdown
+                                remarkPlugins={remarkPlugins}
+                                rehypePlugins={rehypePlugins}
+                                components={markdownComponents}
+                              >
+                                {selectedContent.replace(/^>\s*来源链接：[^\n]*\n*/m, '')}
+                              </ReactMarkdown>
+                            </div>
+                          </ScrollArea>
+                        </ResizablePanel>
+                        <ResizableHandle withHandle />
+                        <ResizablePanel defaultSize={30} maxSize={40} minSize={20}>
+                          <TranscriptViewer />
+                        </ResizablePanel>
+                      </ResizablePanelGroup>
                     ) : (
                       <>
                         <ScrollArea className="min-w-0 flex-1">
@@ -582,11 +608,6 @@ const MarkdownViewer: FC<MarkdownViewerProps> = memo(({ status }) => {
                             </ReactMarkdown>
                           </div>
                         </ScrollArea>
-                        {showTranscribe && (
-                          <div className="ml-2 w-2/4">
-                            <TranscriptViewer />
-                          </div>
-                        )}
                       </>
                     )}
                   </>

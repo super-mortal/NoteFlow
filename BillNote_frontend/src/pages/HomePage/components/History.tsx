@@ -6,11 +6,11 @@ const History = () => {
   const currentTaskId = useTaskStore(state => state.currentTaskId)
   const setCurrentTask = useTaskStore(state => state.setCurrentTask)
   return (
-    <div className={'flex h-full w-full flex-col gap-3 p-3'}>
-      <div className="flex items-center gap-2 text-sm font-medium text-foreground">
-        <Clock className="h-4 w-4 text-muted-foreground" />
+    <div className={'flex h-full w-full flex-col gap-2 p-3'}>
+      <div className="flex items-center gap-1.5 text-xs font-medium text-foreground">
+        <Clock className="h-3 w-3 text-muted-foreground" />
         <span>生成历史</span>
-        <span className="text-xs text-muted-foreground/60 ml-auto">
+        <span className="text-[10px] text-muted-foreground/60 ml-auto">
           {useTaskStore.getState().tasks.length} 条记录
         </span>
       </div>

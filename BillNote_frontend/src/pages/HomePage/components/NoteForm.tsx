@@ -250,6 +250,20 @@ const NoteForm = () => {
   }
   const handleCreateNew = () => {
     setCurrentTask(null)
+    form.reset({
+      platform: 'bilibili',
+      quality: 'medium',
+      model_name: modelList[0]?.model_name || '',
+      style: 'minimal',
+      video_interval: 6,
+      grid_size: [2, 2],
+      format: [],
+      video_url: '',
+      extras: '',
+      screenshot: false,
+      link: false,
+      video_understanding: false,
+    })
   }
 
   /* -------------------- 渲染 -------------------- */
@@ -360,68 +374,29 @@ const NoteForm = () => {
             )}
           />
 
-          {/* 模型 + 风格在一行 */}
-          <div className="grid grid-cols-2 gap-3">
-            {modelList.length > 0 ? (
-              <FormField
-                control={form.control}
-                name="model_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <SectionHeader title="模型" tip="不同模型效果不同，建议自行测试" />
-                    <Select
-                      onOpenChange={() => { loadEnabledModels() }}
-                      value={field.value}
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="w-full min-w-0 truncate">
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {modelList.map(m => (
-                          <SelectItem key={m.id} value={m.model_name}>
-                            {m.model_name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            ) : (
-              <FormItem>
-                <SectionHeader title="模型" tip="配置 AI 模型以生成笔记" />
-                <Button type={'button'} variant={'outline'} onClick={goModelAdd} className="w-full">
-                  请先添加模型
-                </Button>
-                <FormMessage />
-              </FormItem>
-            )}
-
+          {/* 模型 + 风格分两行 */}
+          {modelList.length > 0 ? (
             <FormField
               control={form.control}
-              name="style"
+              name="model_name"
               render={({ field }) => (
                 <FormItem>
-                  <SectionHeader title="风格" tip="选择生成笔记的呈现风格" />
+                  <SectionHeader title="模型" tip="不同模型效果不同，建议自行测试" />
                   <Select
+                    onOpenChange={() => { loadEnabledModels() }}
                     value={field.value}
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
                     <FormControl>
-                      <SelectTrigger className="w-full min-w-0 truncate">
+                      <SelectTrigger className="w-full min-w-0 truncate border-primary/30 focus:ring-primary/30">
                         <SelectValue />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      {noteStyles.map(({ label, value }) => (
-                        <SelectItem key={value} value={value}>
-                          {label}
+                      {modelList.map(m => (
+                        <SelectItem key={m.id} value={m.model_name}>
+                          {m.model_name}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -430,7 +405,44 @@ const NoteForm = () => {
                 </FormItem>
               )}
             />
-          </div>
+          ) : (
+            <FormItem>
+              <SectionHeader title="模型" tip="配置 AI 模型以生成笔记" />
+              <Button type={'button'} variant={'outline'} onClick={goModelAdd} className="w-full border-primary/30 text-primary">
+                请先添加模型
+              </Button>
+              <FormMessage />
+            </FormItem>
+          )}
+
+          <FormField
+            control={form.control}
+            name="style"
+            render={({ field }) => (
+              <FormItem>
+                <SectionHeader title="笔记风格" tip="选择生成笔记的呈现风格" />
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger className="w-full min-w-0 truncate border-primary/30 focus:ring-primary/30">
+                      <SelectValue />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {noteStyles.map(({ label, value }) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           {/* ======== 高级选项（折叠） ======== */}
           <CollapsibleSection title="高级选项">

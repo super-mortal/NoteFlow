@@ -112,14 +112,14 @@ const NoteHistory: FC<NoteHistoryProps> = ({ onSelect, selectedId }) => {
               key={task.id}
               onClick={() => onSelect(task.id)}
               className={cn(
-                'group flex cursor-pointer items-start gap-3 rounded-lg border px-3 py-2.5 transition-all',
+                'group flex cursor-pointer items-center gap-2 rounded-lg border px-2.5 py-2 transition-all',
                 selectedId === task.id
                   ? 'border-primary/40 bg-primary-lighter shadow-sm'
                   : 'border-border/40 bg-white hover:border-border/80 hover:shadow-sm'
               )}
             >
-              {/* 封面 */}
-              <div className="h-10 w-14 shrink-0 overflow-hidden rounded-md bg-muted">
+              {/* 封面 — 缩小 */}
+              <div className="h-8 w-12 shrink-0 overflow-hidden rounded bg-muted">
                 {task.platform === 'local' ? (
                   <img
                     src={task.audioMeta.cover_url ? `${task.audioMeta.cover_url}` : '/placeholder.png'}
@@ -138,31 +138,32 @@ const NoteHistory: FC<NoteHistoryProps> = ({ onSelect, selectedId }) => {
                 )}
               </div>
 
-              {/* 内容 */}
+              {/* 内容 — 更紧凑 */}
               <div className="min-w-0 flex-1">
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <div className="truncate text-sm font-medium text-foreground">
+                      <div className="truncate text-xs font-medium text-foreground">
                         {task.audioMeta.title || '未命名笔记'}
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>{task.audioMeta.title || '未命名笔记'}</p>
+                      <p className="text-xs">{task.audioMeta.title || '未命名笔记'}</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
 
-                <div className="mt-1.5 flex items-center gap-2">
+                <div className="mt-1 flex items-center gap-1.5">
                   <StatusBadge
                     variant={cfg.variant}
                     label={cfg.label}
                     animated={cfg.variant === 'info'}
+                    className="text-[10px] leading-none px-1.5 py-0.5"
                   />
-                  <span className="text-[10px] text-muted-foreground/50">
+                  <span className="text-[9px] text-muted-foreground/50">
                     {getPlatformLabel(task.platform)}
                   </span>
-                  <span className="text-[10px] text-muted-foreground/40">
+                  <span className="text-[9px] text-muted-foreground/40">
                     {formatRelativeTime(task.createdAt)}
                   </span>
                 </div>
@@ -180,9 +181,9 @@ const NoteHistory: FC<NoteHistoryProps> = ({ onSelect, selectedId }) => {
                         e.stopPropagation()
                         removeTask(task.id)
                       }}
-                      className="h-6 w-6 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="h-5 w-5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
                     >
-                      <Trash className="h-3.5 w-3.5 text-muted-foreground" />
+                      <Trash className="h-3 w-3 text-muted-foreground" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
