@@ -1,52 +1,97 @@
-import ProviderCard from '@/components/Form/modelForm/components/providerCard.tsx'
-import { Button } from '@/components/ui/button.tsx'
 import { useProviderStore } from '@/store/providerStore'
-import { useNavigate } from 'react-router-dom'
-import { Search, Plus } from 'lucide-react'
+import { Button } from '@/components/ui/button.tsx'
+import { Switch } from '@/components/ui/switch'
+import { Plus, Loader2 } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import AILogo from '@/components/Form/modelForm/Icons'
+import toast from 'react-hot-toast'
 
-const Provider = () => {
+interface ProviderListProps {
+  selectedId: string | null
+  isCreating: boolean
+  onSelect: (id: string) => void
+  onCreate: () => void
+}
+
+const ProviderList = ({ selectedId, isCreating, onSelect, onCreate }: ProviderListProps) => {
   const providers = useProviderStore(state => state.provider)
-  const navigate = useNavigate()
-  const handleClick = () => {
-    navigate(`/settings/model/new`)
+  const updateProvider = useProviderStore(state => state.updateProvider)
+
+  const handleToggle = async (e: React.MouseEvent, provider: any) => {
+    e.stopPropagation()
+    try {
+      await updateProvider({
+        ...provider,
+        enabled: provider.enabled === 1 ? 0 : 1,
+      })
+    } catch {
+      toast.error('切换失败')
+    }
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      {/* 标题 */}
-      <div>
-        <h3 className="text-sm font-semibold text-foreground">模型供应商</h3>
-        <p className="text-xs text-muted-foreground/60 mt-0.5">{providers?.length || 0} 个供应商</p>
+    <div className="flex h-full flex-col">
+      {/* Header */}
+      <div className="px-3 pb-3">
+        <h3 className="text-sm font-semibold">模型供应商</h3>
+        <p className="mt-0.5 text-xs text-text-tertiary">{providers?.length || 0} 个供应商</p>
       </div>
 
-      {/* 搜索 + 添加 */}
-      <div className="flex gap-2">
-        <div className="relative flex-1">
-          <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-          <input
-            className="h-8 w-full rounded-md border border-border/60 bg-muted/50 pl-8 pr-2 text-xs outline-none placeholder:text-muted-foreground/50 focus:border-primary/50 focus:bg-white transition-colors"
-            placeholder="搜索供应商..."
-          />
-        </div>
-        <Button type="button" onClick={handleClick} size="sm" className="h-8 shrink-0">
-          <Plus className="h-3.5 w-3.5 mr-1" />
-          添加
+      {/* 列表 */}
+      <div className="flex-1 space-y-0.5 overflow-y-auto px-1">
+        {providers?.map(provider => {
+          const isActive = selectedId === provider.id && !isCreating
+          const isChecked = provider.enabled === 1
+          return (
+            <div
+              key={provider.id}
+              onClick={() => onSelect(provider.id)}
+              className={cn(
+                'relative flex cursor-pointer items-center gap-2.5 rounded-lg px-3 py-2.5 transition-all',
+                isActive
+                  ? 'bg-primary-lighter text-primary'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+              )}
+            >
+              {/* 活跃指示条 */}
+              {isActive && (
+                <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-r-full bg-primary" />
+              )}
+
+              <div className="flex h-6 w-6 shrink-0 items-center justify-center">
+                <AILogo name={provider.logo || provider.name} size={18} />
+              </div>
+
+              <div className="min-w-0 flex-1 text-base font-medium truncate">
+                {provider.name}
+              </div>
+
+              <div onClick={e => handleToggle(e, provider)}>
+                <Switch checked={isChecked} className="scale-75" />
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {/* 添加按钮 */}
+      <div className="px-1 pt-3">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={onCreate}
+          className={cn(
+            'w-full gap-1.5 text-xs',
+            isCreating && 'border-primary/40 bg-primary-lighter text-primary',
+          )}
+        >
+          <Plus className="h-3.5 w-3.5" />
+          添加新供应商
         </Button>
-      </div>
-
-      {/* 卡片网格 */}
-      <div className="grid grid-cols-2 gap-2">
-        {providers?.map((provider, index) => (
-          <ProviderCard
-            key={index}
-            providerName={provider.name}
-            Icon={provider.logo}
-            id={provider.id}
-            enable={provider.enabled}
-          />
-        ))}
       </div>
     </div>
   )
 }
-export default Provider
+
+export default ProviderList

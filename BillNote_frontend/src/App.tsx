@@ -22,7 +22,6 @@ function OnboardingGuard({ children }: { children: React.ReactNode }) {
   return <>{children}</>
 }
 const Model = lazy(() => import('@/pages/SettingPage/Model.tsx'))
-const ProviderForm = lazy(() => import('@/components/Form/modelForm/Form.tsx'))
 const AboutPage = lazy(() => import('@/pages/SettingPage/about.tsx'))
 const Monitor = lazy(() => import('@/pages/SettingPage/Monitor.tsx'))
 const Downloader = lazy(() => import('@/pages/SettingPage/Downloader.tsx'))
@@ -72,10 +71,7 @@ function App() {
               <Route index element={<HomePage />} />
               <Route path="settings" element={<SettingPage />}>
                 <Route index element={<Navigate to="model" replace />} />
-                <Route path="model" element={<Model />}>
-                  <Route path="new" element={<ProviderForm isCreate />} />
-                  <Route path=":id" element={<ProviderForm />} />
-                </Route>
+                <Route path="model" element={<Model />} />
                 <Route path="download" element={<Downloader />}>
                   <Route path=":id" element={<DownloaderForm />} />
                 </Route>

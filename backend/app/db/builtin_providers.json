@@ -40,14 +40,6 @@
     "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/"
   },
     {
-    "id": "groq",
-    "name": "Groq",
-    "type": "built-in",
-    "logo": "Groq",
-    "api_key": "",
-    "base_url": "https://api.groq.com/openai/v1"
-  },
-      {
     "id": "ollama",
     "name": "ollama",
     "type": "built-in",
