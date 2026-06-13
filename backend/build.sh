@@ -10,7 +10,7 @@ echo "当前工作目录：$(pwd)"
 
 # 清理旧的构建
 echo "清理旧的构建..."
-rm -rf backend/dist backend/build ./BillNote_frontend/src-tauri/bin/*
+rm -rf backend/dist backend/build ./noteflow_frontend/src-tauri/bin/*
 echo "清理完成。"
 
 TARGET_TRIPLE=$(rustc -Vv | grep host | cut -f2 -d' ')
@@ -28,7 +28,7 @@ pyinstaller \
   -y \
   --name NoteFlowBackend \
   --paths backend \
-  --distpath ./BillNote_frontend/src-tauri/bin \
+  --distpath ./noteflow_frontend/src-tauri/bin \
   --workpath backend/build \
   --specpath backend \
   --hidden-import uvicorn \
@@ -47,12 +47,12 @@ rm backend/.env
 
 # 重命名主执行文件以包含目标平台信息
 mv \
- ./BillNote_frontend/src-tauri/bin/NoteFlowBackend/NoteFlowBackend\
- ./BillNote_frontend/src-tauri/bin/NoteFlowBackend/NoteFlowBackend-$TARGET_TRIPLE
+ ./noteflow_frontend/src-tauri/bin/NoteFlowBackend/NoteFlowBackend\
+ ./noteflow_frontend/src-tauri/bin/NoteFlowBackend/NoteFlowBackend-$TARGET_TRIPLE
 
 echo "PyInstaller 打包完成。"
 echo "打包后的目录内容："
-ls -l ./BillNote_frontend/src-tauri/bin/NoteFlowBackend
+ls -l ./noteflow_frontend/src-tauri/bin/NoteFlowBackend
 
 echo "请检查 src-tauri/bin/NoteFlowBackend 目录，确认其中包含了名为 .env 的【文件】。"
 

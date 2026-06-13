@@ -29,9 +29,9 @@
 
 | 容器名 | 镜像 | 用途 | 内存限制 |
 |--------|------|------|---------|
-| `bilinote-backend` | 本地构建 | Python FastAPI 后端 | 4GB |
-| `bilinote-frontend` | 本地构建 | React 前端（Nginx 托管静态文件） | 512MB |
-| `bilinote-nginx` | `nginx:1.25-alpine` | 反向代理，端口 3015 → 内部分发 | 256MB |
+| `noteflow-backend` | 本地构建 | Python FastAPI 后端 | 4GB |
+| `noteflow-frontend` | 本地构建 | React 前端（Nginx 托管静态文件） | 512MB |
+| `noteflow-nginx` | `nginx:1.25-alpine` | 反向代理，端口 3015 → 内部分发 | 256MB |
 
 ## 核心配置
 
@@ -50,7 +50,7 @@ WHISPER_MODEL_SIZE=tiny        # Whisper 模型大小
 
 ```
 ./backend/
-├── bili_note.db           ← SQLite 数据库（供应商配置、笔记历史）
+├── noteflow.db            ← SQLite 数据库（供应商配置、笔记历史）
 ├── config/                ← 转写器运行时配置
 ├── static/screenshots/    ← 视频截图
 └── uploads/               ← 上传的本地视频

@@ -75,7 +75,7 @@ CI 默认会创建 / 更新 `vX.Y.Z` 对应的 Release。如果你想自己写 r
 2. Tag: 选 `vX.Y.Z`
 3. Title: `vX.Y.Z`
 4. Body: 直接贴 [`CHANGELOG.md`](./CHANGELOG.md) 的对应段
-5. CI 跑完后 Release 页面会自动出现 `bilinote-extension-X.Y.Z.zip` / `.xpi` / `.crx`
+5. CI 跑完后 Release 页面会自动出现 `noteflow-extension-X.Y.Z.zip` / `.xpi` / `.crx`
 
 ## 6. 上传到各商店（人工）
 
@@ -85,7 +85,7 @@ CI 默认会创建 / 更新 `vX.Y.Z` 对应的 Release。如果你想自己写 r
 
 1. https://chrome.google.com/webstore/devconsole
 2. 选 NoteFlow → 左侧 **Package** → **Upload new package**
-3. 上传 `bilinote-extension-X.Y.Z.zip`
+3. 上传 `noteflow-extension-X.Y.Z.zip`
 4. 检查 listing（描述 / 图标 / 截图无变化可保持），点 **Submit for review**
 
 ### Microsoft Edge Add-ons
@@ -99,7 +99,7 @@ CI 默认会创建 / 更新 `vX.Y.Z` 对应的 Release。如果你想自己写 r
 
 1. https://addons.mozilla.org/developers/
 2. 选 NoteFlow → **Upload New Version**
-3. 上传 `bilinote-extension-X.Y.Z.xpi`
+3. 上传 `noteflow-extension-X.Y.Z.xpi`
 4. 选择"在 AMO 公开"或"自托管"
 5. 提交审核
 

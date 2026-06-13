@@ -1,7 +1,7 @@
 
 services:
   backend:
-    container_name: bilinote-backend
+    container_name: noteflow-backend
     build:
       context: .
       dockerfile: backend/Dockerfile.gpu
@@ -39,10 +39,10 @@ services:
               capabilities: ["gpu"]
 
   frontend:
-    container_name: bilinote-frontend
+    container_name: noteflow-frontend
     build:
       context: .
-      dockerfile: BillNote_frontend/Dockerfile
+      dockerfile: noteflow_frontend/Dockerfile
       args:
         BASE_REGISTRY: ${BASE_REGISTRY:-docker.io}
     env_file:
@@ -53,7 +53,7 @@ services:
     mem_limit: 512m
 
   nginx:
-    container_name: bilinote-nginx
+    container_name: noteflow-nginx
     image: nginx:1.25-alpine
     ports:
       - "${APP_PORT}:80"

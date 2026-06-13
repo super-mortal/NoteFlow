@@ -49,10 +49,10 @@ WORKDIR /tmp/frontend
 
 # 先复制 package.json + lockfile 利用依赖层缓存
 # --frozen-lockfile 保证 CI 与本地开发依赖版本一致，杜绝 semver 漂移引入的破坏性升级
-COPY ./BillNote_frontend/package.json ./BillNote_frontend/pnpm-lock.yaml ./
+COPY ./noteflow_frontend/package.json ./noteflow_frontend/pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
-COPY ./BillNote_frontend /tmp/frontend
+COPY ./noteflow_frontend /tmp/frontend
 
 # 设置环境变量，告诉 vite.config.ts 这是 Docker 构建
 ENV DOCKER_BUILD=1
@@ -108,7 +108,7 @@ nodaemon=true
 user=root
 logfile=/var/log/supervisor/supervisord.log
 pidfile=/var/run/supervisord.pid
-environment=BACKEND_PORT="8483",BACKEND_HOST="0.0.0.0",TRANSCRIBER_TYPE="fast-whisper",WHISPER_MODEL_SIZE="tiny",FFMPEG_BIN_PATH="",HF_ENDPOINT="https://hf-mirror.com",STATIC="/static",OUT_DIR="./static/screenshots",DATA_DIR="data",NOTE_OUTPUT_DIR="data/note_results",DATABASE_URL="sqlite:////app/backend/data/bili_note.db",IMAGE_BASE_URL="/static/screenshots",ENV="production",GROQ_TRANSCRIBER_MODEL="whisper-large-v3-turbo"
+environment=BACKEND_PORT="8483",BACKEND_HOST="0.0.0.0",TRANSCRIBER_TYPE="fast-whisper",WHISPER_MODEL_SIZE="tiny",FFMPEG_BIN_PATH="",HF_ENDPOINT="https://hf-mirror.com",STATIC="/static",OUT_DIR="./static/screenshots",DATA_DIR="data",NOTE_OUTPUT_DIR="data/note_results",DATABASE_URL="sqlite:////app/backend/data/noteflow.db",IMAGE_BASE_URL="/static/screenshots",ENV="production",GROQ_TRANSCRIBER_MODEL="whisper-large-v3-turbo"
 
 [program:nginx]
 command=nginx -g "daemon off;"
@@ -133,7 +133,7 @@ RUN sed -i 's/proxy_pass http:\/\/backend:8483/proxy_pass http:\/\/127.0.0.1:848
 
 # 启动 supervisor
 # 推荐启动方式（覆盖默认 env）：
-#   docker run -d --name bilinote --env-file .env -p 8080:80 bilinote-aio
+#   docker run -d --name noteflow --env-file .env -p 8080:80 noteflow-aio
 # 单个变量覆盖：
 #   docker run -d -e TRANSCRIBER_TYPE=groq -e WHISPER_MODEL_SIZE=base ...
 EXPOSE 80
