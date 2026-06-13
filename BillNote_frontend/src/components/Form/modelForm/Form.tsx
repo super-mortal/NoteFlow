@@ -12,12 +12,13 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Switch } from '@/components/ui/switch'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useProviderStore } from '@/store/providerStore'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { testConnection, fetchModels, deleteModelById } from '@/services/model'
-import { Save, TestTube, Loader2, RefreshCw, X, Plus, Brain, Key, Globe, CheckCircle2 } from 'lucide-react'
+import { Save, TestTube, Loader2, RefreshCw, X, Plus, Brain, Key, Globe, CheckCircle2, Wrench } from 'lucide-react'
 import { useModelStore } from '@/store/modelStore'
 import { ModelPickerDialog } from '@/components/Form/modelForm/ModelPickerDialog'
 
@@ -37,6 +38,20 @@ interface ProviderConfigProps {
   onCancel: () => void
 }
 
+/**
+ * 智能补全 OpenAI 兼容 API 的 base_url
+ * - 已包含 /chat/completions → 不变
+ * - 以 /v1 结尾 → 补 /chat/completions
+ * - 其他 → 补 /v1/chat/completions
+ */
+function normalizeBaseUrl(url: string): string {
+  const u = url.trim().replace(/\/+$/, '')
+  if (!u) return u
+  if (/\/chat\/completions$/i.test(u)) return u
+  if (u.endsWith('/v1')) return `${u}/chat/completions`
+  return `${u}/v1/chat/completions`
+}
+
 const ProviderConfig = ({ providerId, isCreate, onSaved }: ProviderConfigProps) => {
   const loadProviderById = useProviderStore(state => state.loadProviderById)
   const updateProvider = useProviderStore(state => state.updateProvider)
@@ -51,6 +66,7 @@ const ProviderConfig = ({ providerId, isCreate, onSaved }: ProviderConfigProps) 
   const [pickerModels, setPickerModels] = useState<any[]>([])
   const [pickerLoading, setPickerLoading] = useState(false)
   const [newModelName, setNewModelName] = useState('')
+  const [autoNormalize, setAutoNormalize] = useState(false)
 
   const providerForm = useForm<ProviderFormValues>({
     resolver: zodResolver(ProviderSchema),
@@ -155,6 +171,18 @@ const ProviderConfig = ({ providerId, isCreate, onSaved }: ProviderConfigProps) 
     }
   }
 
+  const handleDeleteModelFromDialog = async (modelName: string) => {
+    if (!providerId) return
+    const target = models.find((m: any) => m.model_name === modelName)
+    if (!target) return
+    try {
+      await deleteModelById(target.id)
+      await reloadModels()
+    } catch {
+      toast.error('移除失败')
+    }
+  }
+
   const handleManualAdd = async () => {
     const name = newModelName.trim()
     if (!name) { toast.error('请输入模型名称'); return }
@@ -182,6 +210,7 @@ const ProviderConfig = ({ providerId, isCreate, onSaved }: ProviderConfigProps) 
 
   const onProviderSubmit = async (values: ProviderFormValues) => {
     try {
+      // 保存原始用户输入的地址，不自动补齐
       if (!isCreate && providerId) {
         await updateProvider({ ...values, id: providerId })
       } else {
@@ -232,9 +261,20 @@ const ProviderConfig = ({ providerId, isCreate, onSaved }: ProviderConfigProps) 
           <Form {...providerForm}>
             <form onSubmit={providerForm.handleSubmit(onProviderSubmit)}>
               <div className="rounded-xl border border-border/40 bg-white p-5 shadow-sm space-y-4">
-                <div className="flex items-center gap-2 border-l-2 border-primary pl-3">
-                  <Key className="h-4 w-4 text-primary" />
-                  <h3 className="text-sm font-medium">API 凭证</h3>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 border-l-2 border-primary pl-3">
+                    <Key className="h-4 w-4 text-primary" />
+                    <h3 className="text-sm font-medium">API 凭证</h3>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Wrench className="h-3 w-3 text-text-tertiary" />
+                    <span className="text-xs text-text-tertiary">自动补齐</span>
+                    <Switch
+                      checked={autoNormalize}
+                      onCheckedChange={setAutoNormalize}
+                      className="scale-75"
+                    />
+                  </div>
                 </div>
 
                 <FormField
@@ -264,8 +304,17 @@ const ProviderConfig = ({ providerId, isCreate, onSaved }: ProviderConfigProps) 
                         API 地址
                       </FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="https://api.openai.com/v1" className="h-9 font-mono text-sm" />
+                        <Input
+                          {...field}
+                          placeholder="https://api.openai.com/v1"
+                          className="h-9 font-mono text-sm"
+                        />
                       </FormControl>
+                      {autoNormalize && field.value && (
+                        <p className="text-xs text-green-600 mt-1">
+                          实际请求地址：{normalizeBaseUrl(field.value)}
+                        </p>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -383,6 +432,7 @@ const ProviderConfig = ({ providerId, isCreate, onSaved }: ProviderConfigProps) 
         loading={pickerLoading}
         onAddModel={handleAddModel}
         onBatchAdd={handleBatchAdd}
+        onDeleteModel={handleDeleteModelFromDialog}
       />
     </ScrollArea>
   )

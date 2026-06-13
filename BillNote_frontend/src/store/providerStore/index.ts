@@ -17,6 +17,7 @@ interface ProviderStore {
   loadProviderById: (id: string) => Promise<void>
   addNewProvider: (provider: IProvider) => Promise<void>
   updateProvider: (provider: IProvider) => Promise<void>
+  removeProvider: (id: string) => Promise<void>
 }
 
 export const useProviderStore = create<ProviderStore>((set, get) => ({
@@ -89,6 +90,9 @@ export const useProviderStore = create<ProviderStore>((set, get) => ({
     } catch (error) {
       console.error('Error updating provider:', error)
     }
+  },
+  removeProvider: async (id: string) => {
+    set(state => ({ provider: state.provider.filter(p => p.id !== id) }))
   },
   getProviderList: () => get().provider,
   fetchProviderList: async () => {

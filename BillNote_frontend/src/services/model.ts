@@ -45,3 +45,7 @@ export const fetchEnableModels = async () => {
 export const deleteModelById = async (modelId: number) => {
   return await request.get(`/models/delete/${modelId}`)
 }
+
+export const deleteProvider = async (id: string) => {
+  return await request.post('/delete_provider', { id })
+}

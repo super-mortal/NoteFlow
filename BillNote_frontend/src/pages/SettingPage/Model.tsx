@@ -24,8 +24,6 @@ const Model = () => {
   }
 
   const handleSaved = () => {
-    setIsCreating(false)
-    setSelectedId(null)
     fetchProviderList()
   }
 

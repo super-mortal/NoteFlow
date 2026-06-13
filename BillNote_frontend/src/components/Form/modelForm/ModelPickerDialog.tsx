@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -8,7 +8,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Loader2, Plus, Check, Search, X } from 'lucide-react'
+import { Loader2, Plus, Minus, Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface ModelItem {
@@ -23,6 +23,7 @@ interface ModelPickerDialogProps {
   loading: boolean
   onAddModel: (modelId: string) => Promise<void>
   onBatchAdd: (modelIds: string[]) => Promise<void>
+  onDeleteModel: (modelName: string) => Promise<void>
 }
 
 export function ModelPickerDialog({
@@ -33,10 +34,12 @@ export function ModelPickerDialog({
   loading,
   onAddModel,
   onBatchAdd,
+  onDeleteModel,
 }: ModelPickerDialogProps) {
   const [search, setSearch] = useState('')
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [addingSet, setAddingSet] = useState<Set<string>>(new Set())
+  const [deletingSet, setDeletingSet] = useState<Set<string>>(new Set())
   const [batchAdding, setBatchAdding] = useState(false)
 
   const normalizedExisting = new Set(existingModelNames.map(n => n.toLowerCase()))
@@ -47,6 +50,14 @@ export function ModelPickerDialog({
     return m.id.toLowerCase().includes(kw)
   })
 
+  // 可添加的（在过滤结果中且未添加）
+  const addableFiltered = useMemo(
+    () => filtered.filter(m => !normalizedExisting.has(m.id.toLowerCase())),
+    [filtered, normalizedExisting],
+  )
+
+  const isAllSelected = addableFiltered.length > 0 && addableFiltered.every(m => selected.has(m.id))
+
   const toggleSelect = (id: string) => {
     const next = new Set(selected)
     if (next.has(id)) next.delete(id)
@@ -54,12 +65,13 @@ export function ModelPickerDialog({
     setSelected(next)
   }
 
-  const selectAllFiltered = () => {
-    const ids = filtered.filter(m => !normalizedExisting.has(m.id.toLowerCase())).map(m => m.id)
-    setSelected(new Set(ids))
+  const toggleSelectAll = () => {
+    if (isAllSelected) {
+      setSelected(new Set())
+    } else {
+      setSelected(new Set(addableFiltered.map(m => m.id)))
+    }
   }
-
-  const clearSelection = () => setSelected(new Set())
 
   const handleAddSingle = async (id: string) => {
     setAddingSet(prev => new Set(prev).add(id))
@@ -69,6 +81,19 @@ export function ModelPickerDialog({
       setAddingSet(prev => {
         const next = new Set(prev)
         next.delete(id)
+        return next
+      })
+    }
+  }
+
+  const handleDeleteSingle = async (name: string) => {
+    setDeletingSet(prev => new Set(prev).add(name))
+    try {
+      await onDeleteModel(name)
+    } finally {
+      setDeletingSet(prev => {
+        const next = new Set(prev)
+        next.delete(name)
         return next
       })
     }
@@ -105,11 +130,18 @@ export function ModelPickerDialog({
           />
         </div>
 
-        {/* 全选/取消 */}
-        {!loading && filtered.length > 0 && (
-          <div className="flex items-center justify-between text-xs text-text-tertiary">
-            <button onClick={selectAllFiltered} className="hover:text-primary transition-colors">全选</button>
-            <button onClick={clearSelection} className="hover:text-primary transition-colors">取消选择</button>
+        {/* 全选/取消全选 toggle */}
+        {!loading && addableFiltered.length > 0 && (
+          <div className="flex items-center justify-between text-xs">
+            <button
+              onClick={toggleSelectAll}
+              className="text-text-tertiary hover:text-primary transition-colors"
+            >
+              {isAllSelected ? '取消全选' : '全选'}
+              <span className="ml-1">
+                ({selected.size}/{addableFiltered.length})
+              </span>
+            </button>
           </div>
         )}
 
@@ -125,43 +157,59 @@ export function ModelPickerDialog({
               {filtered.map(m => {
                 const alreadyAdded = normalizedExisting.has(m.id.toLowerCase())
                 const isAdding = addingSet.has(m.id)
+                const isDeleting = deletingSet.has(m.id)
                 const isSelected = selected.has(m.id)
+
+                if (alreadyAdded) {
+                  return (
+                    <div
+                      key={m.id}
+                      className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm opacity-60"
+                    >
+                      <span className="flex-1 truncate font-mono text-xs">{m.id}</span>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        disabled={isDeleting}
+                        onClick={() => handleDeleteSingle(m.id)}
+                        className="h-7 w-7 shrink-0 p-0 text-red-400 hover:text-red-600"
+                        title="移除模型"
+                      >
+                        {isDeleting ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <Minus className="h-3.5 w-3.5" />
+                        )}
+                      </Button>
+                    </div>
+                  )
+                }
+
                 return (
                   <div
                     key={m.id}
-                    className={cn(
-                      'flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors',
-                      alreadyAdded ? 'opacity-50' : 'hover:bg-muted',
-                    )}
+                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-muted"
                   >
                     <input
                       type="checkbox"
                       checked={isSelected}
-                      disabled={alreadyAdded}
                       onChange={() => toggleSelect(m.id)}
                       className="h-3.5 w-3.5 rounded border-border text-primary accent-primary"
                     />
                     <span className="flex-1 truncate font-mono text-xs">{m.id}</span>
-                    {alreadyAdded ? (
-                      <span className="flex items-center gap-1 text-xs text-green-600 shrink-0">
-                        <Check className="h-3 w-3" />
-                        已添加
-                      </span>
-                    ) : (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        disabled={isAdding}
-                        onClick={() => handleAddSingle(m.id)}
-                        className="h-7 w-7 shrink-0 p-0"
-                      >
-                        {isAdding ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        ) : (
-                          <Plus className="h-3.5 w-3.5" />
-                        )}
-                      </Button>
-                    )}
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      disabled={isAdding}
+                      onClick={() => handleAddSingle(m.id)}
+                      className="h-7 w-7 shrink-0 p-0"
+                    >
+                      {isAdding ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <Plus className="h-3.5 w-3.5" />
+                      )}
+                    </Button>
                   </div>
                 )
               })}
