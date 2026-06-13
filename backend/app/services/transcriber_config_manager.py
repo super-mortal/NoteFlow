@@ -57,6 +57,15 @@ class TranscriberConfigManager:
                 "openai_transcriber_api_key",
                 os.getenv("OPENAI_TRANSCRIBER_API_KEY", ""),
             ),
+            # Groq 配置（在 /settings/transcriber 页面直接配置，不依赖 ProviderService）
+            "groq_api_key": data.get(
+                "groq_api_key",
+                os.getenv("GROQ_TRANSCRIBER_API_KEY", ""),
+            ),
+            "groq_model": data.get(
+                "groq_model",
+                os.getenv("GROQ_TRANSCRIBER_MODEL", "whisper-large-v3"),
+            ),
         }
 
     def update_config(
@@ -67,6 +76,8 @@ class TranscriberConfigManager:
         openai_transcriber_model: Optional[str] = None,
         openai_transcriber_base_url: Optional[str] = None,
         openai_transcriber_api_key: Optional[str] = None,
+        groq_api_key: Optional[str] = None,
+        groq_model: Optional[str] = None,
     ) -> Dict[str, Any]:
         """更新转写器配置并持久化。"""
         data = self._read()
@@ -81,6 +92,10 @@ class TranscriberConfigManager:
             data["openai_transcriber_base_url"] = openai_transcriber_base_url
         if openai_transcriber_api_key is not None:
             data["openai_transcriber_api_key"] = openai_transcriber_api_key
+        if groq_api_key is not None:
+            data["groq_api_key"] = groq_api_key
+        if groq_model is not None:
+            data["groq_model"] = groq_model
         self._write(data)
         return self.get_config()
 

@@ -49,6 +49,8 @@ class TranscriberConfigRequest(BaseModel):
     openai_transcriber_model: Optional[str] = None
     openai_transcriber_base_url: Optional[str] = None
     openai_transcriber_api_key: Optional[str] = None
+    groq_api_key: Optional[str] = None
+    groq_model: Optional[str] = None
 
 
 AVAILABLE_TRANSCRIBER_TYPES = [
@@ -78,6 +80,14 @@ def get_transcriber_config():
         "whisper_builtin_models": BUILTIN_WHISPER_MODELS,
         "whisper_custom_models": registry.get_custom_models(),
         "mlx_whisper_available": MLX_WHISPER_AVAILABLE,
+        # Groq 预设信息
+        "groq_base_url": "https://api.groq.com/openai/v1",
+        "groq_preset_models": [
+            "whisper-large-v3",
+            "whisper-large-v3-turbo",
+            "distil-whisper-large-v3-en",
+            "whisper-1",
+        ],
     })
 
 
@@ -122,8 +132,39 @@ def update_transcriber_config(data: TranscriberConfigRequest):
         openai_transcriber_model=data.openai_transcriber_model,
         openai_transcriber_base_url=data.openai_transcriber_base_url,
         openai_transcriber_api_key=data.openai_transcriber_api_key,
+        groq_api_key=data.groq_api_key,
+        groq_model=data.groq_model,
     )
     return R.success(data=config)
+
+
+class TranscriberTestRequest(BaseModel):
+    base_url: str
+    api_key: str
+    model: Optional[str] = None
+
+
+@router.post("/transcriber_test")
+def test_transcriber_connection(data: TranscriberTestRequest):
+    """测试转写器连通性：列出模型列表验证 API Key 和 Base URL 是否有效"""
+    from app.utils.openai_client import build_openai_client
+
+    if not data.api_key:
+        return R.error(msg="API Key 不能为空")
+    if not data.base_url:
+        return R.error(msg="Base URL 不能为空")
+
+    client = build_openai_client(
+        api_key=data.api_key,
+        base_url=data.base_url.rstrip('/'),
+        key_label="转写引擎测试",
+    )
+    try:
+        models = client.models.list()
+        return R.success(data={"models": [m.id for m in models]}, msg="连接成功")
+    except Exception as e:
+        logger.error(f"转写器连通性测试失败: {e}")
+        return R.error(msg=f"连接失败: {str(e)[:200]}")
 
 
 # ---- 全局代理配置（作用于 LLM API + 转写 API + yt-dlp 下载）----

@@ -54,8 +54,8 @@ def _init_transcriber(key: TranscriberType, cls, *args, **kwargs):
     return _transcribers[key]
 
 # 各类型获取方法
-def get_groq_transcriber():
-    return _init_transcriber(TranscriberType.GROQ, GroqTranscriber)
+def get_groq_transcriber(api_key=None, model=None):
+    return _init_transcriber(TranscriberType.GROQ, GroqTranscriber, api_key=api_key, model=model)
 
 def get_whisper_transcriber(model_size="base", device="cuda"):
     return _init_transcriber(TranscriberType.FAST_WHISPER, WhisperTranscriber, model_size=model_size, device=device)
@@ -130,7 +130,12 @@ def get_transcriber(transcriber_type="fast-whisper", model_size="base", device="
         return get_kuaishou_transcriber()
 
     elif transcriber_enum == TranscriberType.GROQ:
-        return get_groq_transcriber()
+        from app.services.transcriber_config_manager import TranscriberConfigManager
+        cfg = TranscriberConfigManager().get_config()
+        return get_groq_transcriber(
+            api_key=cfg.get("groq_api_key"),
+            model=cfg.get("groq_model", "whisper-large-v3"),
+        )
     
     elif transcriber_enum == TranscriberType.OPENAI_COMPATIBLE:
         return get_openai_compatible_transcriber(provider_id=provider_id, model_name=model_name)

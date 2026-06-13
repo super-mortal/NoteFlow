@@ -18,6 +18,14 @@ export interface TranscriberConfig {
   openai_transcriber_base_url: string
   /** OpenAI 兼容转写器的 API Key */
   openai_transcriber_api_key: string
+  /** Groq API Key */
+  groq_api_key: string
+  /** Groq 模型名称 */
+  groq_model: string
+  /** Groq 固定 Base URL */
+  groq_base_url: string
+  /** Groq 预设模型列表 */
+  groq_preset_models: string[]
 }
 
 export interface ModelStatus {
@@ -43,6 +51,8 @@ export const updateTranscriberConfig = async (data: {
   openai_transcriber_model?: string
   openai_transcriber_base_url?: string
   openai_transcriber_api_key?: string
+  groq_api_key?: string
+  groq_model?: string
 }) => {
   return await request.post('/transcriber_config', data)
 }
@@ -76,4 +86,13 @@ export const addWhisperModel = async (data: { name: string; target: string }) =>
 /** 删除自定义模型映射（不会删除已下载的模型文件） */
 export const deleteWhisperModel = async (name: string) => {
   return await request.delete(`/whisper_models/${encodeURIComponent(name)}`)
+}
+
+/** 测试转写器连通性 */
+export const testTranscriberConnection = async (data: {
+  base_url: string
+  api_key: string
+  model?: string
+}) => {
+  return await request.post('/transcriber_test', data)
 }
