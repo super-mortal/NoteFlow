@@ -121,6 +121,13 @@ def run_note_task(task_id: str, video_url: str, platform: str, quality: Download
     if not model_name or not provider_id:
         raise HTTPException(status_code=400, detail="请选择模型和提供者")
 
+    # 自动推断：如果 format 包含 screenshot 但 screenshot 参数未传，补上
+    if _format and 'screenshot' in _format:
+        screenshot = True
+    # 同样的逻辑：如果 format 包含 link 但 link 参数未传，补上
+    if _format and 'link' in _format:
+        link = True
+
     def _execute_note_task():
         return NoteGenerator().generate(
             video_url=video_url,
