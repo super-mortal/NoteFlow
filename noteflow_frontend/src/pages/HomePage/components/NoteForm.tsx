@@ -4,7 +4,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@/components/ui/form.tsx'
 import { useEffect, useState } from 'react'
@@ -16,21 +15,20 @@ import {
   Info,
   Loader2,
   Plus,
-  ChevronRight,
   Sparkles,
 } from 'lucide-react'
-import { Alert, AlertDescription } from '@/components/ui/alert.tsx'
 import { generateNote } from '@/services/note.ts'
 import { uploadFile } from '@/services/upload.ts'
 import { useTaskStore } from '@/store/taskStore'
 import { useModelStore } from '@/store/modelStore'
+import { useSystemStore } from '@/store/configStore'
+import { getAdvancedNoteConfig } from '@/services/advancedNote'
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip.tsx'
-import { Checkbox } from '@/components/ui/checkbox.tsx'
 import { ScrollArea } from '@/components/ui/scroll-area.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import {
@@ -41,13 +39,12 @@ import {
   SelectValue,
 } from '@/components/ui/select.tsx'
 import { Input } from '@/components/ui/input.tsx'
-import { Textarea } from '@/components/ui/textarea.tsx'
-import { noteStyles, noteFormats, videoPlatforms } from '@/constant/note.ts'
+import { Switch } from '@/components/ui/switch.tsx'
+import { noteStyles, videoPlatforms } from '@/constant/note.ts'
 import { fetchModels } from '@/services/model.ts'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import PlatformIconGroup from '@/components/PlatformIconGroup'
-import CollapsibleSection from '@/components/CollapsibleSection'
 
 /* -------------------- 校验 Schema（不变）--------------------------- */
 const formSchema = z
@@ -110,31 +107,6 @@ const SectionHeader = ({ title, tip }: { title: string; tip?: string }) => (
   </div>
 )
 
-const CheckboxGroup = ({
-  value = [],
-  onChange,
-  disabledMap,
-}: {
-  value?: string[]
-  onChange: (v: string[]) => void
-  disabledMap: Record<string, boolean>
-}) => (
-  <div className="flex flex-wrap gap-2">
-    {noteFormats.map(({ label, value: v }) => (
-      <label key={v} className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer">
-        <Checkbox
-          checked={value.includes(v)}
-          disabled={disabledMap[v]}
-          onCheckedChange={checked =>
-            onChange(checked ? [...value, v] : value.filter(x => x !== v))
-          }
-        />
-        <span>{label}</span>
-      </label>
-    ))}
-  </div>
-)
-
 /* -------------------- 主组件 -------------------- */
 const NoteForm = () => {
   const navigate = useNavigate();
@@ -144,6 +116,7 @@ const NoteForm = () => {
   const { addPendingTask, currentTaskId, setCurrentTask, getCurrentTask, retryTask } =
     useTaskStore()
   const { loadEnabledModels, modelList, showFeatureHint, setShowFeatureHint } = useModelStore()
+  const { useAdvancedConfig, setUseAdvancedConfig } = useSystemStore()
 
   /* ---- 表单 ---- */
   const form = useForm<NoteFormValues>({
@@ -162,7 +135,6 @@ const NoteForm = () => {
 
   /* ---- 派生状态（只 watch 一次，提高性能） ---- */
   const platform = useWatch({ control: form.control, name: 'platform' }) as string
-  const videoUnderstandingEnabled = useWatch({ control: form.control, name: 'video_understanding' })
   const editing = currentTask && currentTask.id
 
   const goModelAdd = () => {
@@ -176,6 +148,14 @@ const NoteForm = () => {
   useEffect(() => {
     if (!currentTask) return
     const { formData } = currentTask
+
+    // 方案A：编辑老任务时，开关跟随该任务当年是否启用了高级参数（以 video_understanding
+    // 或非空 format/extras 作为「用过高级参数」的判据），保证重试=复现。
+    const usedAdvanced =
+      !!formData.video_understanding ||
+      (!!formData.format && formData.format.length > 0) ||
+      !!formData.extras
+    setUseAdvancedConfig(usedAdvanced)
 
     form.reset({
       platform: formData.platform || 'bilibili',
@@ -218,8 +198,46 @@ const NoteForm = () => {
   }
 
   const onSubmit = async (values: NoteFormValues) => {
+    // 高级参数处理：
+    //  - 编辑/重试老任务（方案A）：沿用该任务原有的高级参数，保证重试结果一致；
+    //  - 开启「启用高级参数」开关：读取设置页后端配置；
+    //  - 否则：提交默认空值，让后端走无高级参数的默认行为。
+    let advancedOverrides: Partial<NoteFormValues> = {}
+    if (editing && currentTask?.formData) {
+      const fd = currentTask.formData
+      advancedOverrides = {
+        format: fd.format ?? [],
+        extras: fd.extras ?? '',
+        video_understanding: fd.video_understanding ?? false,
+        video_interval: fd.video_interval ?? 6,
+        grid_size: fd.grid_size ?? [2, 2],
+      }
+    } else if (useAdvancedConfig) {
+      try {
+        const cfg = await getAdvancedNoteConfig()
+        advancedOverrides = {
+          format: cfg.format ?? [],
+          extras: cfg.extras ?? '',
+          video_understanding: !!cfg.video_understanding,
+          video_interval: cfg.video_interval ?? 6,
+          grid_size: cfg.grid_size ?? [2, 2],
+        }
+      } catch (e) {
+        console.error('读取高级参数配置失败：', e)
+        toast.error('读取高级参数配置失败，请检查设置页')
+        return
+      }
+    } else {
+      advancedOverrides = {
+        format: [],
+        extras: '',
+        video_understanding: false,
+      }
+    }
+
     const payload: NoteFormValues = {
       ...values,
+      ...advancedOverrides,
       provider_id: modelList.find(m => m.model_name === values.model_name)!.provider_id,
       task_id: currentTaskId || '',
     }
@@ -444,108 +462,27 @@ const NoteForm = () => {
             )}
           />
 
-          {/* ======== 高级选项（折叠） ======== */}
-          <CollapsibleSection title="高级选项">
-            {/* 笔记格式 */}
-            <FormField
-              control={form.control}
-              name="format"
-              render={({ field }) => (
-                <FormItem>
-                  <SectionHeader title="笔记格式" tip="选择要包含的笔记元素" />
-                  <CheckboxGroup
-                    value={field.value}
-                    onChange={field.onChange}
-                    disabledMap={{
-                      link: platform === 'local',
-                      screenshot: !videoUnderstandingEnabled,
-                    }}
-                  />
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* 视频理解 */}
-            <SectionHeader title="视频理解" tip="将视频截图发给多模态模型辅助分析" />
-            <div className="flex flex-col gap-2">
-              <FormField
-                control={form.control}
-                name="video_understanding"
-                render={({ field }) => (
-                  <FormItem>
-                    <div className="flex items-center gap-2">
-                      <FormLabel className="text-xs text-muted-foreground">启用</FormLabel>
-                      <Checkbox
-                        checked={videoUnderstandingEnabled}
-                        onCheckedChange={v => form.setValue('video_understanding', v)}
-                      />
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid grid-cols-2 gap-3">
-                <FormField
-                  control={form.control}
-                  name="video_interval"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-xs text-muted-foreground">采样间隔（秒）</FormLabel>
-                      <Input disabled={!videoUnderstandingEnabled} type="number" {...field} className="h-8" />
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="grid_size"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-xs text-muted-foreground">拼图尺寸（列 × 行）</FormLabel>
-                      <div className="flex items-center gap-1">
-                        <Input
-                          disabled={!videoUnderstandingEnabled}
-                          type="number"
-                          value={field.value?.[0] || 3}
-                          onChange={e => field.onChange([+e.target.value, field.value?.[1] || 3])}
-                          className="w-14 h-8"
-                        />
-                        <span className="text-muted-foreground text-xs">x</span>
-                        <Input
-                          disabled={!videoUnderstandingEnabled}
-                          type="number"
-                          value={field.value?.[1] || 3}
-                          onChange={e => field.onChange([field.value?.[0] || 3, +e.target.value])}
-                          className="w-14 h-8"
-                        />
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <Alert variant="warning" className="text-xs py-2">
-                <AlertDescription>
-                  <strong>提示：</strong>视频理解功能必须使用多模态模型。
-                </AlertDescription>
-              </Alert>
+          {/* ======== 启用高级参数开关 ======== */}
+          <div className="flex items-center justify-between rounded-lg border border-border/40 px-3 py-2.5">
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm font-medium text-foreground">启用高级参数</span>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="h-3.5 w-3.5 cursor-pointer text-muted-foreground" />
+                  </TooltipTrigger>
+                  <TooltipContent className="text-xs max-w-[220px]">
+                    开启后，将应用「设置 → 笔记高级参数」中配置的笔记格式、视频理解、备注等参数。
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
-
-            {/* 备注 */}
-            <FormField
-              control={form.control}
-              name="extras"
-              render={({ field }) => (
-                <FormItem>
-                  <SectionHeader title="备注" tip="可在 Prompt 结尾附加自定义说明" />
-                  <Textarea placeholder="笔记需要罗列出 xxx 关键点…" {...field} />
-                  <FormMessage />
-                </FormItem>
-              )}
+            <Switch
+              checked={useAdvancedConfig}
+              onCheckedChange={setUseAdvancedConfig}
+              disabled={!!editing}
             />
-          </CollapsibleSection>
+          </div>
         </form>
       </Form>
     </div>

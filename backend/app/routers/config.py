@@ -11,6 +11,7 @@ from app.utils.path_helper import get_model_dir
 
 from app.services.cookie_manager import CookieConfigManager
 from app.services.transcriber_config_manager import TranscriberConfigManager
+from app.services.advanced_note_config_manager import AdvancedNoteConfigManager
 from ffmpeg_helper import ensure_ffmpeg_or_raise
 
 logger = get_logger(__name__)
@@ -18,6 +19,7 @@ logger = get_logger(__name__)
 router = APIRouter()
 cookie_manager = CookieConfigManager()
 transcriber_config_manager = TranscriberConfigManager()
+advanced_note_config_manager = AdvancedNoteConfigManager()
 
 
 class CookieUpdateRequest(BaseModel):
@@ -134,6 +136,41 @@ def update_transcriber_config(data: TranscriberConfigRequest):
         openai_transcriber_api_key=data.openai_transcriber_api_key,
         groq_api_key=data.groq_api_key,
         groq_model=data.groq_model,
+    )
+    return R.success(data=config)
+
+
+# ---- 笔记生成「高级参数」配置（从首页表单迁移到设置页统一管理）----
+
+class AdvancedNoteConfigRequest(BaseModel):
+    format: Optional[list] = None
+    extras: Optional[str] = None
+    video_understanding: Optional[bool] = None
+    video_interval: Optional[int] = None
+    grid_size: Optional[list] = None
+
+
+@router.get("/advanced_note_config")
+def get_advanced_note_config():
+    cfg = advanced_note_config_manager.get_config()
+    # 顺带返回可选的笔记格式清单，供设置页渲染勾选项
+    cfg["available_formats"] = [
+        {"label": "目录", "value": "toc"},
+        {"label": "原片跳转", "value": "link"},
+        {"label": "原片截图", "value": "screenshot"},
+        {"label": "AI总结", "value": "summary"},
+    ]
+    return R.success(data=cfg)
+
+
+@router.post("/advanced_note_config")
+def update_advanced_note_config(data: AdvancedNoteConfigRequest):
+    config = advanced_note_config_manager.update_config(
+        format=data.format,
+        extras=data.extras,
+        video_understanding=data.video_understanding,
+        video_interval=data.video_interval,
+        grid_size=data.grid_size,
     )
     return R.success(data=config)
 

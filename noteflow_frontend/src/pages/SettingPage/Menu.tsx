@@ -4,6 +4,7 @@ import {
   HardDriveDownload,
   Info,
   Activity,
+  SlidersHorizontal,
 } from 'lucide-react'
 import MenuBar, { IMenuProps } from '@/pages/SettingPage/components/menuBar.tsx'
 
@@ -26,6 +27,12 @@ const Menu = () => {
       name: '下载配置',
       icon: <HardDriveDownload />,
       path: '/settings/download',
+    },
+    {
+      id: 'advanced-note',
+      name: '笔记高级参数',
+      icon: <SlidersHorizontal />,
+      path: '/settings/advanced-note',
     },
     {
       id: 'monitor',
