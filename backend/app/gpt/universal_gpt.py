@@ -24,7 +24,7 @@ class UniversalGPT(GPT):
         self.screenshot = False
         self.link = False
         self.max_request_bytes = int(os.getenv("OPENAI_MAX_REQUEST_BYTES", str(45 * 1024 * 1024)))
-        self.checkpoint_dir = Path(os.getenv("NOTE_OUTPUT_DIR", "note_results"))
+        self.checkpoint_dir = Path(os.getenv("NOTE_OUTPUT_DIR", "data/notes"))
         self.checkpoint_dir.mkdir(parents=True, exist_ok=True)
         # 初始化时缓存重试配置，避免每次请求重复读取环境变量
         self._max_retry_attempts = max(1, int(os.getenv("OPENAI_RETRY_ATTEMPTS", "3")))

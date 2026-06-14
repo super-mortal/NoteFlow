@@ -308,19 +308,10 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
-/backend/data/*
-/backend/static/*
-/backend/note_tasks.db
-/backend/bin/
-/backend/logs/
-/backend/note_results
-/backend/models
-/backend/.idea/*
-/backend/noteflow.db
+/backend/data/
 /backend/uploads/*
 /backend/.idea/*
 /backend/config/*
-/backend/vector_db/
 /BiliNote_frontend/.idea/*
 /BiliNote_frontend/src-tauri/bin/
 

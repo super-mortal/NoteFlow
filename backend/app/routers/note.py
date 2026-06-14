@@ -64,7 +64,9 @@ class VideoRequest(BaseModel):
         return v
 
 
-NOTE_OUTPUT_DIR = os.getenv("NOTE_OUTPUT_DIR", "note_results")
+from app.utils.path_helper import get_notes_dir
+
+NOTE_OUTPUT_DIR = os.getenv("NOTE_OUTPUT_DIR", get_notes_dir())
 UPLOAD_DIR = "uploads"
 
 

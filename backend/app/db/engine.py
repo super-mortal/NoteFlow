@@ -5,8 +5,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# 默认 SQLite，如果想换 PostgreSQL 或 MySQL，可以直接改 .env
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///noteflow.db")
+# 默认 SQLite，统一存放在 data/noteflow.db
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///data/noteflow.db")
 
 # SQLite 需要特定连接参数，其他数据库不需要
 engine_args = {}

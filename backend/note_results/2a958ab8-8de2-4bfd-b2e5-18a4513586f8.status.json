@@ -1,0 +1,4 @@
+{
+  "status": "FAILED",
+  "message": "ERROR: [BiliBili] 1kM7R6TEAy: Unable to download JSON metadata: HTTP Error 412: Precondition Failed (caused by <HTTPError 412: Precondition Failed>)"
+}

@@ -38,6 +38,12 @@
     },
     "active": true,
     "targets": "all",
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser",
+        "displayLanguageSelector": true
+      }
+    },
     "icon": [
       "icons/icon.ico",
       "icons/icon.png"

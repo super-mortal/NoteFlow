@@ -1,0 +1,315 @@
+{
+  "file_path": "/app/data/data/BV1RkVb6VEyM.mp3",
+  "title": "传智杯国赛之智慧教育平台",
+  "duration": 1180.636,
+  "cover_url": "http://i1.hdslb.com/bfs/archive/183e826479dd2cb0677223a222231cf457dd219b.jpg",
+  "platform": "bilibili",
+  "video_id": "BV1RkVb6VEyM",
+  "raw_info": {
+    "uploader": "Super_mortal",
+    "uploader_id": "2090094430",
+    "like_count": 0,
+    "tags": [
+      "原创",
+      "校园",
+      "生活记录",
+      "#传智杯",
+      "记录",
+      "#教育",
+      "#比赛"
+    ],
+    "thumbnail": "http://i1.hdslb.com/bfs/archive/183e826479dd2cb0677223a222231cf457dd219b.jpg",
+    "description": "传智杯-web应用开发挑战赛-智慧教育平台\n感谢观看",
+    "timestamp": 1780031426,
+    "view_count": 54,
+    "comment_count": 0,
+    "id": "BV1RkVb6VEyM",
+    "_old_archive_ids": [
+      "bilibili 116656093267145_part1"
+    ],
+    "title": "传智杯国赛之智慧教育平台",
+    "http_headers": {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      "Accept": "*/*",
+      "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+      "Sec-Fetch-Mode": "navigate",
+      "Referer": "https://www.bilibili.com/video/BV1RkVb6VEyM/?spm_id_from=333.1387.homepage.video_card.click",
+      "Accept-Encoding": "gzip, deflate, br",
+      "Origin": "https://www.bilibili.com"
+    },
+    "formats": [
+      {
+        "url": "https://upos-sz-mirrorcos.bilivideo.com/upgcxcode/57/73/38690227357/38690227357-1-30216.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&nbs=1&platform=pc&gen=playurlv3&os=cosbv&og=cos&uipk=5&trid=633d70973c3746368f7a08ad5206b5cu&deadline=1781174633&oi=1885414025&mid=0&upsig=de25e8abb7cddacebb15c060e322d67a&uparams=e,nbs,platform,gen,os,og,uipk,trid,deadline,oi,mid&bvc=vod&nettype=0&bw=67250&lrs=-1&f=u_0_0&qn_dyeid=b6efeaf981608c9b001082c76a2a7549&agrr=1&buvid=A5B34D42-F34C-BDEF-7A59-CE31E9B29CC370282infoc&build=0&dl=0&orderid=0,3",
+        "ext": "m4a",
+        "acodec": "mp4a.40.2",
+        "vcodec": "none",
+        "tbr": 67.195,
+        "filesize": null,
+        "format_id": "30216",
+        "protocol": "https",
+        "audio_ext": "m4a",
+        "video_ext": "none",
+        "vbr": 0,
+        "abr": 67.195,
+        "resolution": "audio only",
+        "aspect_ratio": null,
+        "filesize_approx": 9916604,
+        "http_headers": {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          "Accept": "*/*",
+          "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+          "Sec-Fetch-Mode": "navigate",
+          "Referer": "https://www.bilibili.com/video/BV1RkVb6VEyM/?spm_id_from=333.1387.homepage.video_card.click",
+          "Accept-Encoding": "gzip, deflate, br",
+          "Origin": "https://www.bilibili.com"
+        },
+        "format": "30216 - audio only"
+      },
+      {
+        "url": "https://upos-sz-estgcos.bilivideo.com/upgcxcode/57/73/38690227357/38690227357-1-30232.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&oi=1885414025&gen=playurlv3&os=estgcos&uipk=5&trid=633d70973c3746368f7a08ad5206b5cu&platform=pc&deadline=1781174633&og=cos&mid=0&nbs=1&upsig=3a73c4c05f5e0b25235e6ca3726a476c&uparams=e,oi,gen,os,uipk,trid,platform,deadline,og,mid,nbs&bvc=vod&nettype=0&bw=107788&lrs=-1&buvid=A5B34D42-F34C-BDEF-7A59-CE31E9B29CC370282infoc&build=0&dl=0&f=u_0_0&qn_dyeid=b6efeaf981608c9b001082c76a2a7549&agrr=1&orderid=0,3",
+        "ext": "m4a",
+        "acodec": "mp4a.40.2",
+        "vcodec": "none",
+        "tbr": 107.711,
+        "filesize": null,
+        "format_id": "30232",
+        "protocol": "https",
+        "audio_ext": "m4a",
+        "video_ext": "none",
+        "vbr": 0,
+        "abr": 107.711,
+        "resolution": "audio only",
+        "aspect_ratio": null,
+        "filesize_approx": 15895935,
+        "http_headers": {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          "Accept": "*/*",
+          "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+          "Sec-Fetch-Mode": "navigate",
+          "Referer": "https://www.bilibili.com/video/BV1RkVb6VEyM/?spm_id_from=333.1387.homepage.video_card.click",
+          "Accept-Encoding": "gzip, deflate, br",
+          "Origin": "https://www.bilibili.com"
+        },
+        "format": "30232 - audio only"
+      },
+      {
+        "url": "https://upos-sz-mirror08c.bilivideo.com/upgcxcode/57/73/38690227357/38690227357-1-30280.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&oi=1885414025&uipk=5&os=08cbv&og=hw&trid=633d70973c3746368f7a08ad5206b5cu&mid=0&gen=playurlv3&nbs=1&platform=pc&deadline=1781174633&upsig=4eaf154088612c5277a395e9cac3058c&uparams=e,oi,uipk,os,og,trid,mid,gen,nbs,platform,deadline&bvc=vod&nettype=0&bw=219687&lrs=-1&qn_dyeid=b6efeaf981608c9b001082c76a2a7549&agrr=1&buvid=A5B34D42-F34C-BDEF-7A59-CE31E9B29CC370282infoc&build=0&dl=0&f=u_0_0&orderid=0,3",
+        "ext": "m4a",
+        "acodec": "mp4a.40.2",
+        "vcodec": "none",
+        "tbr": 219.549,
+        "filesize": null,
+        "format_id": "30280",
+        "protocol": "https",
+        "audio_ext": "m4a",
+        "video_ext": "none",
+        "vbr": 0,
+        "abr": 219.549,
+        "resolution": "audio only",
+        "aspect_ratio": null,
+        "filesize_approx": 32400931,
+        "http_headers": {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          "Accept": "*/*",
+          "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+          "Sec-Fetch-Mode": "navigate",
+          "Referer": "https://www.bilibili.com/video/BV1RkVb6VEyM/?spm_id_from=333.1387.homepage.video_card.click",
+          "Accept-Encoding": "gzip, deflate, br",
+          "Origin": "https://www.bilibili.com"
+        },
+        "format": "30280 - audio only"
+      },
+      {
+        "url": "https://upos-sz-estgcos.bilivideo.com/upgcxcode/57/73/38690227357/38690227357-1-30016.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&trid=633d70973c3746368f7a08ad5206b5cu&mid=0&platform=pc&gen=playurlv3&deadline=1781174633&oi=1885414025&nbs=1&os=estgcos&og=cos&uipk=5&upsig=a7af696ab6778e7104646d659c354cab&uparams=e,trid,mid,platform,gen,deadline,oi,nbs,os,og,uipk&bvc=vod&nettype=0&bw=65685&lrs=-1&buvid=A5B34D42-F34C-BDEF-7A59-CE31E9B29CC370282infoc&build=0&dl=0&f=u_0_0&qn_dyeid=b6efeaf981608c9b001082c76a2a7549&agrr=1&orderid=0,3",
+        "ext": "mp4",
+        "fps": 29.915,
+        "width": 640,
+        "height": 342,
+        "vcodec": "avc1.64001E",
+        "acodec": "none",
+        "dynamic_range": "SDR",
+        "tbr": 65.631,
+        "filesize": null,
+        "quality": 16,
+        "format_id": "30016",
+        "format": "360P 流畅",
+        "protocol": "https",
+        "video_ext": "mp4",
+        "audio_ext": "none",
+        "abr": 0,
+        "vbr": 65.631,
+        "resolution": "640x342",
+        "aspect_ratio": 1.87,
+        "filesize_approx": 9685790,
+        "http_headers": {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          "Accept": "*/*",
+          "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+          "Sec-Fetch-Mode": "navigate",
+          "Referer": "https://www.bilibili.com/video/BV1RkVb6VEyM/?spm_id_from=333.1387.homepage.video_card.click",
+          "Accept-Encoding": "gzip, deflate, br",
+          "Origin": "https://www.bilibili.com"
+        }
+      },
+      {
+        "url": "https://upos-sz-estgcos.bilivideo.com/upgcxcode/57/73/38690227357/38690227357-1-30032.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&oi=1885414025&trid=633d70973c3746368f7a08ad5206b5cu&gen=playurlv3&os=estgcos&og=cos&nbs=1&platform=pc&deadline=1781174633&uipk=5&mid=0&upsig=0d75e79905a23bf0b60ee61119353941&uparams=e,oi,trid,gen,os,og,nbs,platform,deadline,uipk,mid&bvc=vod&nettype=0&bw=101609&lrs=-1&agrr=1&buvid=A5B34D42-F34C-BDEF-7A59-CE31E9B29CC370282infoc&build=0&dl=0&f=u_0_0&qn_dyeid=b6efeaf981608c9b001082c76a2a7549&orderid=0,3",
+        "ext": "mp4",
+        "fps": 29.915,
+        "width": 854,
+        "height": 458,
+        "vcodec": "avc1.64001F",
+        "acodec": "none",
+        "dynamic_range": "SDR",
+        "tbr": 101.535,
+        "filesize": null,
+        "quality": 32,
+        "format_id": "30032",
+        "format": "480P 标清",
+        "protocol": "https",
+        "video_ext": "mp4",
+        "audio_ext": "none",
+        "abr": 0,
+        "vbr": 101.535,
+        "resolution": "854x458",
+        "aspect_ratio": 1.86,
+        "filesize_approx": 14984484,
+        "http_headers": {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          "Accept": "*/*",
+          "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+          "Sec-Fetch-Mode": "navigate",
+          "Referer": "https://www.bilibili.com/video/BV1RkVb6VEyM/?spm_id_from=333.1387.homepage.video_card.click",
+          "Accept-Encoding": "gzip, deflate, br",
+          "Origin": "https://www.bilibili.com"
+        }
+      }
+    ],
+    "duration": 1180.636,
+    "chapters": [
+      {
+        "title": "项目介绍",
+        "start_time": 0,
+        "end_time": 47
+      },
+      {
+        "title": "演示环境说明",
+        "start_time": 47,
+        "end_time": 111
+      },
+      {
+        "title": "首页与数据导入",
+        "start_time": 111,
+        "end_time": 222
+      },
+      {
+        "title": "AI助手与知识库",
+        "start_time": 222,
+        "end_time": 463
+      },
+      {
+        "title": "错题管理与AI分析",
+        "start_time": 463,
+        "end_time": 655
+      },
+      {
+        "title": "智能学习计划",
+        "start_time": 655,
+        "end_time": 830
+      },
+      {
+        "title": "笔记功能",
+        "start_time": 830,
+        "end_time": 886
+      },
+      {
+        "title": "学习社区",
+        "start_time": 886,
+        "end_time": 978
+      },
+      {
+        "title": "成绩管理与反馈",
+        "start_time": 978,
+        "end_time": 1049
+      },
+      {
+        "title": "后台功能与总结",
+        "start_time": 1049,
+        "end_time": 1181
+      }
+    ],
+    "subtitles": {},
+    "webpage_url": "https://www.bilibili.com/video/BV1RkVb6VEyM/?spm_id_from=333.1387.homepage.video_card.click",
+    "original_url": "https://www.bilibili.com/video/BV1RkVb6VEyM/?spm_id_from=333.1387.homepage.video_card.click",
+    "webpage_url_basename": "BV1RkVb6VEyM",
+    "webpage_url_domain": "bilibili.com",
+    "extractor": "BiliBili",
+    "extractor_key": "BiliBili",
+    "playlist": null,
+    "playlist_index": null,
+    "thumbnails": [
+      {
+        "url": "http://i1.hdslb.com/bfs/archive/183e826479dd2cb0677223a222231cf457dd219b.jpg",
+        "id": "0"
+      }
+    ],
+    "display_id": "BV1RkVb6VEyM",
+    "fulltitle": "传智杯国赛之智慧教育平台",
+    "duration_string": "19:40",
+    "upload_date": "20260529",
+    "release_year": null,
+    "requested_subtitles": null,
+    "_has_drm": null,
+    "epoch": 1781167433,
+    "requested_downloads": [
+      {
+        "http_headers": {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          "Accept": "*/*",
+          "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+          "Sec-Fetch-Mode": "navigate",
+          "Referer": "https://www.bilibili.com/video/BV1RkVb6VEyM/?spm_id_from=333.1387.homepage.video_card.click",
+          "Accept-Encoding": "gzip, deflate, br",
+          "Origin": "https://www.bilibili.com"
+        },
+        "url": "https://upos-sz-mirror08c.bilivideo.com/upgcxcode/57/73/38690227357/38690227357-1-30280.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&oi=1885414025&uipk=5&os=08cbv&og=hw&trid=633d70973c3746368f7a08ad5206b5cu&mid=0&gen=playurlv3&nbs=1&platform=pc&deadline=1781174633&upsig=4eaf154088612c5277a395e9cac3058c&uparams=e,oi,uipk,os,og,trid,mid,gen,nbs,platform,deadline&bvc=vod&nettype=0&bw=219687&lrs=-1&qn_dyeid=b6efeaf981608c9b001082c76a2a7549&agrr=1&buvid=A5B34D42-F34C-BDEF-7A59-CE31E9B29CC370282infoc&build=0&dl=0&f=u_0_0&orderid=0,3",
+        "ext": "mp3",
+        "acodec": "mp4a.40.2",
+        "vcodec": "none",
+        "tbr": 219.549,
+        "format_id": "30280",
+        "protocol": "https",
+        "audio_ext": "m4a",
+        "video_ext": "none",
+        "vbr": 0,
+        "abr": 219.549,
+        "resolution": "audio only",
+        "filesize_approx": 32400931,
+        "format": "30280 - audio only",
+        "_filename": "/app/data/data/BV1RkVb6VEyM.m4a",
+        "filename": "/app/data/data/BV1RkVb6VEyM.m4a",
+        "__postprocessors": [],
+        "__real_download": true,
+        "__finaldir": "/app/data/data",
+        "filepath": "/app/data/data/BV1RkVb6VEyM.mp3",
+        "__write_download_archive": true
+      }
+    ],
+    "url": "https://upos-sz-mirror08c.bilivideo.com/upgcxcode/57/73/38690227357/38690227357-1-30280.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&oi=1885414025&uipk=5&os=08cbv&og=hw&trid=633d70973c3746368f7a08ad5206b5cu&mid=0&gen=playurlv3&nbs=1&platform=pc&deadline=1781174633&upsig=4eaf154088612c5277a395e9cac3058c&uparams=e,oi,uipk,os,og,trid,mid,gen,nbs,platform,deadline&bvc=vod&nettype=0&bw=219687&lrs=-1&qn_dyeid=b6efeaf981608c9b001082c76a2a7549&agrr=1&buvid=A5B34D42-F34C-BDEF-7A59-CE31E9B29CC370282infoc&build=0&dl=0&f=u_0_0&orderid=0,3",
+    "ext": "m4a",
+    "acodec": "mp4a.40.2",
+    "vcodec": "none",
+    "tbr": 219.549,
+    "filesize": null,
+    "format_id": "30280",
+    "protocol": "https",
+    "audio_ext": "m4a",
+    "video_ext": "none",
+    "vbr": 0,
+    "abr": 219.549,
+    "resolution": "audio only",
+    "aspect_ratio": null,
+    "filesize_approx": 32400931,
+    "format": "30280 - audio only"
+  },
+  "video_path": null
+}

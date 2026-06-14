@@ -50,10 +50,12 @@ WHISPER_MODEL_SIZE=tiny        # Whisper 模型大小
 
 ```
 ./backend/
-├── noteflow.db            ← SQLite 数据库（供应商配置、笔记历史）
-├── config/                ← 转写器运行时配置
-├── static/screenshots/    ← 视频截图
-└── uploads/               ← 上传的本地视频
+├── data/
+│   ├── noteflow.db          ← SQLite 数据库（供应商配置、笔记历史）
+│   ├── notes/               ← 生成的 Markdown 笔记
+│   └── screenshots/         ← 视频截图
+├── config/                  ← 转写器运行时配置
+└── uploads/                 ← 上传的本地视频
 ```
 
 **容器删除不会丢失数据**，所有数据在宿主机 `./backend` 目录中。

@@ -1,0 +1,379 @@
+{
+  "markdown": "> 来源链接：https://www.bilibili.com/video/BV1Nz5165EfK/?spm_id_from=333.1387.homepage.video_card.click&vd_source=608d1fc4ed09b2213ecdf1ce8f6122b2\n\n# workbuddy 应用挑战赛（PPT大师）笔记\n\n## 概述\n- 参赛赛道：校园自动化赛道\n- 技能名称：PPT大师（基于workbuddy的Skills）\n- 目标：根据用户输入，自动生成原生可编辑的PPT（joML格式），支持二次编辑，而非纯图片。\n\n## 核心工作流程\n1. **接收用户输入**：用户提供文档或指定内容、风格等。\n2. **初始化项目结构**：自动生成文件目录。\n3. **读取设计规范**：每生成一页SVG前，重新读取规范文件，防止AI偏离主题。\n4. **逐页生成SVG**：使用AI生成每页的SVG图形。\n5. **质量门检测**：用Python脚本检测每页SVG是否合格，不合格则重新生成，直至通过。\n6. **导出为PPT**：最终通过Python脚本将SVG映射为原生可编辑的joML文件，可在Office中直接编辑。\n\n## 关键特性\n- **原生可编辑**：与传统生成图片的方式不同，输出文件每个模块都可独立编辑，文字、图形均可修改。\n- **质量保障**：每页生成前重新读取规范，并设质量门循环检测，避免AI“幻觉”导致内容偏离。\n- **低积分消耗**：每次生成仅消耗2-5积分，成本较低。\n\n## 交互式使用演示\n- 用户在workbuddy中调用PPT大师技能，可选择“快速模式”（默认数据）或“交互模式”。\n- **交互模式优势**：用户可自定义数据、配色方案（如科技蓝）、图标等，生成效果更美观。\n- 示例配置：技术团队、科技发布风格、配色：科技蓝，性能数据准确。\n- 生成过程：初始化解题结构 → 生成规范文档 → 逐页生成SVG → 质量检测 → 导出PPT文件。\n- 最终PPT内所有内容均可二次编辑，风格一致。\n\n## 示例对比\n- 默认快速模式生成的PPT配色不够美观。\n- 交互模式生成的PPT在配色、数据准确性上明显更优（如第三页、第四页风格统一，数据准确）。\n\n## 其他\n- 若未来有可生成图片的模型，可额外启用AI生图功能（当前模型不支持）。\n- 视频时长约10分钟，展示了前三页的生成预览，后两页略过。",
+  "transcript": {
+    "language": null,
+    "full_text": "OK啊大家好，我这里录制的是一个全自杯的workbody场景应用挑战赛。然后我参加的是第二个赛道。校园自动化赛道做的是一个。PPT的那个skills。KT大师的ski。然后这个呢是。他的简要的工作流程，这里也有。诶。首先呢他会接受。这个用户的输入。然后确认了内内容之后，就会初始化项目结构生成这样子的一个结构。然后。然后确认之后就会读取这个设计规范，去每页生成这个生成SVG。并且生成HVG的时候，有一个规范，就是每页生成之前都会重新读取它这个规范文件，防止它的生成内容不规范。然后会有一些质量门去检测它是否合格，这个都用pyython去检测它是否合格。如果说不合格的话，它就会在这一步重新制作。只有这一步完成了，合格了才会进入下一步。总体来说，最后做完的时候，它会用python脚本去导出。导出一个。原生可编辑的joML文件。这样子我们在那个office打开的时候，就可以对PPT进行二次编辑，而不像传统的一些生成，直接生成图片，到时候就没办法第二次编辑了。然后呢。一开始我是给了他一个这样子的。文档，然后让他给我设计，然后他分析了工作流程之后，就给我做了一个这样子的。Scuse.test two做了一个这样子s case。这个是他介绍文件，这些设置一些它的质量检查脚本和后面的导出的。导出为那个PPT插文件的那个脚本。然后做完了之后，我又用了这个work party的。创建技能的技能，让他给我封装成了1个PPT skills。一直到最后，他直接给我打包好了一个完整的压缩包文件，然后在这个。技能这里，然后上传就可以了。上传了之后直接就可以去用。然后我这里一开始是做了一个。这个是是发布的PPT然后。嗯，他这个是因为我选择的是快速模式，然后全部都选默认的。的。一些数据吧。默认的一些这个去直接生成，然后生成的时候就打出了PPT。制作完成会有汇报，然后导上PPT的话，就会在这个。文件夹里面。然后工作中间这个。然后。我们先来看一下那个。PPT然后就是在这个文件导出这个。因为然后它导出全部都是原生可以编辑的，不是单纯的一种图片的那种。有一些那种图片的，他没办法编辑了，我就不太喜欢。这个可以每一个模块都可以原生继续编辑。然后呢，我现在重新再做一份交互式使用的。演示吧。然后先创建一个。创建一个下。然后回到乌克巴。好用这个技能去做。然后用。这个技量去做。手啊有。然后直接发给他，他就帮盘做。然后我看过他这个做一个积分消耗的还是挺少的，一般两个积分到5个积分就可以。让我们等待。然后金简版演示的话，我们就先做少一点的吧，不要花太多时间。技术团队。管理层技术团队，然后设计风格的话。科技发布方。图标的话。图标的话暂时就不要这个C了，因为。他这个模型我看过了，没有可以生成图片的模型。后面如果自定义模型的话，有可以生成图片的模型的话，就可以用AI生图。然后这里就选这个就好了，然后完成。这个图像生成的话是有一个专门的角色。这个需要申图的时候才会被处处罚。然后我们回到这里。配色方案。科技蓝D不C蓝。荣要给。性能数据给准。完钱。然后确认了之后就可以。去生成。这个交互是相对的好处的话，就是可以自己确认一些数据啊，风格之类的。默认的话，它都会默认那个数据去做做出来就不太好看。比如说这个这个配色就不是很好看。然后完成了之后，开会。它会初始化列表会创建一个。这样子的。这个放那个AI生成图片的，如果没有的话，这个应该是坑。这个是演讲者笔记。这个是搜出的SVG图片，等一下就会有。这个是最后导出的PPT插文件。会先生成一份一份规矩，一份那个规范的文档。我们耐心等待就好。这个就是。推动很大。推放文档就在这里了。然后就会每页开始主页开始生成SVG图片。他每次生成SVG图片的时候，都会回到这个阶段。都会重新读取这个规范文档。防止他的内容不合格，有时候AI幻想嘛，他有时候会偏离主题。所以说设计了一个这样子的逻辑。然后也会有对应的资量门检测。比如说。呃，如果说他这一步不合格的话。按照流程走，它就会在这里重新生成，不会进入到下一步。第一页已经生成了，我们就先看一下。然后就是这样子一个页面，到时候经过。导入之后就会成这样子可以编辑的。每一个内容所有内容都是完全可以编辑。而不是单纯的图片，现在它预览的是这样子。然后。看一下第二页。第二页。然后这个配色的话就比这种默认的好看很多。你看这个默认的就不是很好看，这个就是交互式的好处。还是第三个。这个S于G图片。做1个PPT下来花不了。第三页完成了，我们继续看一下第三页。还是很好看的啊。然后这个数据的话也比较准确，都是搜索的。准确数据。第四页。OK第四页完成了，我们再来看一下第四页。总体的话，它的风格都很一致。比如这种科技的男的这种风格还是很一致的。然后呢，处理完之后，他会用。这个脚本。去映射成这个专业MM的的形状，这样子去导出PPT文件的时候，它就是可以编辑的嘛。然后呢，它这个。需要一点点时间，然后就暂时不等了。视频也十0分钟了，然后暂时不同第五页，这个就是最后一页。然后后面的话就不等了。然后我的展示就到这里，感谢大家的观看。",
+    "segments": [
+      {
+        "start": 0.0,
+        "end": 0.0,
+        "text": "OK啊大家好，我这里录制的是一个全自杯的workbody场景应用挑战赛。然后我参加的是第二个赛道。校园自动化赛道做的是一个。PPT的那个skills。KT大师的ski。然后这个呢是。他的简要的工作流程，这里也有。诶。首先呢他会接受。这个用户的输入。然后确认了内内容之后，就会初始化项目结构生成这样子的一个结构。然后。然后确认之后就会读取这个设计规范，去每页生成这个生成SVG。并且生成HVG的时候，有一个规范，就是每页生成之前都会重新读取它这个规范文件，防止它的生成内容不规范。然后会有一些质量门去检测它是否合格，这个都用pyython去检测它是否合格。如果说不合格的话，它就会在这一步重新制作。只有这一步完成了，合格了才会进入下一步。总体来说，最后做完的时候，它会用python脚本去导出。导出一个。原生可编辑的joML文件。这样子我们在那个office打开的时候，就可以对PPT进行二次编辑，而不像传统的一些生成，直接生成图片，到时候就没办法第二次编辑了。然后呢。一开始我是给了他一个这样子的。文档，然后让他给我设计，然后他分析了工作流程之后，就给我做了一个这样子的。Scuse.test two做了一个这样子s case。这个是他介绍文件，这些设置一些它的质量检查脚本和后面的导出的。导出为那个PPT插文件的那个脚本。然后做完了之后，我又用了这个work party的。创建技能的技能，让他给我封装成了1个PPT skills。一直到最后，他直接给我打包好了一个完整的压缩包文件，然后在这个。技能这里，然后上传就可以了。上传了之后直接就可以去用。然后我这里一开始是做了一个。这个是是发布的PPT然后。嗯，他这个是因为我选择的是快速模式，然后全部都选默认的。的。一些数据吧。默认的一些这个去直接生成，然后生成的时候就打出了PPT。制作完成会有汇报，然后导上PPT的话，就会在这个。文件夹里面。然后工作中间这个。然后。我们先来看一下那个。PPT然后就是在这个文件导出这个。因为然后它导出全部都是原生可以编辑的，不是单纯的一种图片的那种。有一些那种图片的，他没办法编辑了，我就不太喜欢。这个可以每一个模块都可以原生继续编辑。然后呢，我现在重新再做一份交互式使用的。演示吧。然后先创建一个。创建一个下。然后回到乌克巴。好用这个技能去做。然后用。这个技量去做。手啊有。然后直接发给他，他就帮盘做。然后我看过他这个做一个积分消耗的还是挺少的，一般两个积分到5个积分就可以。让我们等待。然后金简版演示的话，我们就先做少一点的吧，不要花太多时间。技术团队。管理层技术团队，然后设计风格的话。科技发布方。图标的话。图标的话暂时就不要这个C了，因为。他这个模型我看过了，没有可以生成图片的模型。后面如果自定义模型的话，有可以生成图片的模型的话，就可以用AI生图。然后这里就选这个就好了，然后完成。这个图像生成的话是有一个专门的角色。这个需要申图的时候才会被处处罚。然后我们回到这里。配色方案。科技蓝D不C蓝。荣要给。性能数据给准。完钱。然后确认了之后就可以。去生成。这个交互是相对的好处的话，就是可以自己确认一些数据啊，风格之类的。默认的话，它都会默认那个数据去做做出来就不太好看。比如说这个这个配色就不是很好看。然后完成了之后，开会。它会初始化列表会创建一个。这样子的。这个放那个AI生成图片的，如果没有的话，这个应该是坑。这个是演讲者笔记。这个是搜出的SVG图片，等一下就会有。这个是最后导出的PPT插文件。会先生成一份一份规矩，一份那个规范的文档。我们耐心等待就好。这个就是。推动很大。推放文档就在这里了。然后就会每页开始主页开始生成SVG图片。他每次生成SVG图片的时候，都会回到这个阶段。都会重新读取这个规范文档。防止他的内容不合格，有时候AI幻想嘛，他有时候会偏离主题。所以说设计了一个这样子的逻辑。然后也会有对应的资量门检测。比如说。呃，如果说他这一步不合格的话。按照流程走，它就会在这里重新生成，不会进入到下一步。第一页已经生成了，我们就先看一下。然后就是这样子一个页面，到时候经过。导入之后就会成这样子可以编辑的。每一个内容所有内容都是完全可以编辑。而不是单纯的图片，现在它预览的是这样子。然后。看一下第二页。第二页。然后这个配色的话就比这种默认的好看很多。你看这个默认的就不是很好看，这个就是交互式的好处。还是第三个。这个S于G图片。做1个PPT下来花不了。第三页完成了，我们继续看一下第三页。还是很好看的啊。然后这个数据的话也比较准确，都是搜索的。准确数据。第四页。OK第四页完成了，我们再来看一下第四页。总体的话，它的风格都很一致。比如这种科技的男的这种风格还是很一致的。然后呢，处理完之后，他会用。这个脚本。去映射成这个专业MM的的形状，这样子去导出PPT文件的时候，它就是可以编辑的嘛。然后呢，它这个。需要一点点时间，然后就暂时不等了。视频也十0分钟了，然后暂时不同第五页，这个就是最后一页。然后后面的话就不等了。然后我的展示就到这里，感谢大家的观看。"
+      }
+    ],
+    "raw": {
+      "text": "OK啊大家好，我这里录制的是一个全自杯的workbody场景应用挑战赛。然后我参加的是第二个赛道。校园自动化赛道做的是一个。PPT的那个skills。KT大师的ski。然后这个呢是。他的简要的工作流程，这里也有。诶。首先呢他会接受。这个用户的输入。然后确认了内内容之后，就会初始化项目结构生成这样子的一个结构。然后。然后确认之后就会读取这个设计规范，去每页生成这个生成SVG。并且生成HVG的时候，有一个规范，就是每页生成之前都会重新读取它这个规范文件，防止它的生成内容不规范。然后会有一些质量门去检测它是否合格，这个都用pyython去检测它是否合格。如果说不合格的话，它就会在这一步重新制作。只有这一步完成了，合格了才会进入下一步。总体来说，最后做完的时候，它会用python脚本去导出。导出一个。原生可编辑的joML文件。这样子我们在那个office打开的时候，就可以对PPT进行二次编辑，而不像传统的一些生成，直接生成图片，到时候就没办法第二次编辑了。然后呢。一开始我是给了他一个这样子的。文档，然后让他给我设计，然后他分析了工作流程之后，就给我做了一个这样子的。Scuse.test two做了一个这样子s case。这个是他介绍文件，这些设置一些它的质量检查脚本和后面的导出的。导出为那个PPT插文件的那个脚本。然后做完了之后，我又用了这个work party的。创建技能的技能，让他给我封装成了1个PPT skills。一直到最后，他直接给我打包好了一个完整的压缩包文件，然后在这个。技能这里，然后上传就可以了。上传了之后直接就可以去用。然后我这里一开始是做了一个。这个是是发布的PPT然后。嗯，他这个是因为我选择的是快速模式，然后全部都选默认的。的。一些数据吧。默认的一些这个去直接生成，然后生成的时候就打出了PPT。制作完成会有汇报，然后导上PPT的话，就会在这个。文件夹里面。然后工作中间这个。然后。我们先来看一下那个。PPT然后就是在这个文件导出这个。因为然后它导出全部都是原生可以编辑的，不是单纯的一种图片的那种。有一些那种图片的，他没办法编辑了，我就不太喜欢。这个可以每一个模块都可以原生继续编辑。然后呢，我现在重新再做一份交互式使用的。演示吧。然后先创建一个。创建一个下。然后回到乌克巴。好用这个技能去做。然后用。这个技量去做。手啊有。然后直接发给他，他就帮盘做。然后我看过他这个做一个积分消耗的还是挺少的，一般两个积分到5个积分就可以。让我们等待。然后金简版演示的话，我们就先做少一点的吧，不要花太多时间。技术团队。管理层技术团队，然后设计风格的话。科技发布方。图标的话。图标的话暂时就不要这个C了，因为。他这个模型我看过了，没有可以生成图片的模型。后面如果自定义模型的话，有可以生成图片的模型的话，就可以用AI生图。然后这里就选这个就好了，然后完成。这个图像生成的话是有一个专门的角色。这个需要申图的时候才会被处处罚。然后我们回到这里。配色方案。科技蓝D不C蓝。荣要给。性能数据给准。完钱。然后确认了之后就可以。去生成。这个交互是相对的好处的话，就是可以自己确认一些数据啊，风格之类的。默认的话，它都会默认那个数据去做做出来就不太好看。比如说这个这个配色就不是很好看。然后完成了之后，开会。它会初始化列表会创建一个。这样子的。这个放那个AI生成图片的，如果没有的话，这个应该是坑。这个是演讲者笔记。这个是搜出的SVG图片，等一下就会有。这个是最后导出的PPT插文件。会先生成一份一份规矩，一份那个规范的文档。我们耐心等待就好。这个就是。推动很大。推放文档就在这里了。然后就会每页开始主页开始生成SVG图片。他每次生成SVG图片的时候，都会回到这个阶段。都会重新读取这个规范文档。防止他的内容不合格，有时候AI幻想嘛，他有时候会偏离主题。所以说设计了一个这样子的逻辑。然后也会有对应的资量门检测。比如说。呃，如果说他这一步不合格的话。按照流程走，它就会在这里重新生成，不会进入到下一步。第一页已经生成了，我们就先看一下。然后就是这样子一个页面，到时候经过。导入之后就会成这样子可以编辑的。每一个内容所有内容都是完全可以编辑。而不是单纯的图片，现在它预览的是这样子。然后。看一下第二页。第二页。然后这个配色的话就比这种默认的好看很多。你看这个默认的就不是很好看，这个就是交互式的好处。还是第三个。这个S于G图片。做1个PPT下来花不了。第三页完成了，我们继续看一下第三页。还是很好看的啊。然后这个数据的话也比较准确，都是搜索的。准确数据。第四页。OK第四页完成了，我们再来看一下第四页。总体的话，它的风格都很一致。比如这种科技的男的这种风格还是很一致的。然后呢，处理完之后，他会用。这个脚本。去映射成这个专业MM的的形状，这样子去导出PPT文件的时候，它就是可以编辑的嘛。然后呢，它这个。需要一点点时间，然后就暂时不等了。视频也十0分钟了，然后暂时不同第五页，这个就是最后一页。然后后面的话就不等了。然后我的展示就到这里，感谢大家的观看。"
+    }
+  },
+  "audio_meta": {
+    "file_path": "/app/data/data/BV1Nz5165EfK.mp3",
+    "title": "workbuddy应用挑战赛（PPT大师）",
+    "duration": 628.619,
+    "cover_url": "http://i2.hdslb.com/bfs/archive/6ce3358954f521eef84b78cfb755e07ed63744ac.jpg",
+    "platform": "bilibili",
+    "video_id": "BV1Nz5165EfK",
+    "raw_info": {
+      "uploader": "Super_mortal",
+      "uploader_id": "2090094430",
+      "like_count": 24,
+      "tags": [
+        "大师",
+        "生活记录",
+        "设计",
+        "智能",
+        "技术",
+        "编程",
+        "PPT",
+        "工具",
+        "挑战赛",
+        "记录"
+      ],
+      "thumbnail": "http://i2.hdslb.com/bfs/archive/6ce3358954f521eef84b78cfb755e07ed63744ac.jpg",
+      "description": "workbuddy应用挑战赛（PPT大师）\nPPT大师一键完成一些简单的PPT制作，后续打算完善增加一些预设模版，按照模版去做会更好看\n感谢观看",
+      "timestamp": 1778663558,
+      "view_count": 1514,
+      "comment_count": 15,
+      "id": "BV1Nz5165EfK",
+      "_old_archive_ids": [
+        "bilibili 116566486158191_part1"
+      ],
+      "title": "workbuddy应用挑战赛（PPT大师）",
+      "http_headers": {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "*/*",
+        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+        "Sec-Fetch-Mode": "navigate",
+        "Referer": "https://www.bilibili.com/video/BV1Nz5165EfK/?spm_id_from=333.1387.homepage.video_card.click&vd_source=608d1fc4ed09b2213ecdf1ce8f6122b2",
+        "Accept-Encoding": "gzip, deflate, br",
+        "Origin": "https://www.bilibili.com"
+      },
+      "formats": [
+        {
+          "url": "https://upos-sz-estgcos.bilivideo.com/upgcxcode/45/73/38302647345/38302647345-1-30216.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&trid=11c607d71e324fc7b8e04936ca2a3b5u&os=estgcos&og=cos&platform=pc&mid=0&nbs=1&deadline=1781172711&uipk=5&gen=playurlv3&oi=1885414025&upsig=08552064507da549b56df8dafb3671f7&uparams=e,trid,os,og,platform,mid,nbs,deadline,uipk,gen,oi&bvc=vod&nettype=0&bw=67291&lrs=-1&build=0&dl=0&f=u_0_0&qn_dyeid=1844dd61c22e63d5009a540a6a2a6dc7&agrr=1&buvid=A5B34D42-F34C-BDEF-7A59-CE31E9B29CC370282infoc&orderid=0,3",
+          "ext": "m4a",
+          "acodec": "mp4a.40.2",
+          "vcodec": "none",
+          "tbr": 67.205,
+          "filesize": null,
+          "format_id": "30216",
+          "protocol": "https",
+          "audio_ext": "m4a",
+          "video_ext": "none",
+          "vbr": 0,
+          "abr": 67.205,
+          "resolution": "audio only",
+          "aspect_ratio": null,
+          "filesize_approx": 5280792,
+          "http_headers": {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "*/*",
+            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+            "Sec-Fetch-Mode": "navigate",
+            "Referer": "https://www.bilibili.com/video/BV1Nz5165EfK/?spm_id_from=333.1387.homepage.video_card.click&vd_source=608d1fc4ed09b2213ecdf1ce8f6122b2",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Origin": "https://www.bilibili.com"
+          },
+          "format": "30216 - audio only"
+        },
+        {
+          "url": "https://upos-sz-mirrorzos.bilivideo.com/upgcxcode/45/73/38302647345/38302647345-1-30232.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&platform=pc&mid=0&nbs=1&deadline=1781172711&os=zosbv&trid=11c607d71e324fc7b8e04936ca2a3b5u&uipk=5&gen=playurlv3&og=hw&oi=1885414025&upsig=a88ca32b50983560d1bfc8ed727922fe&uparams=e,platform,mid,nbs,deadline,os,trid,uipk,gen,og,oi&bvc=vod&nettype=0&bw=108195&lrs=-1&qn_dyeid=1844dd61c22e63d5009a540a6a2a6dc7&agrr=1&buvid=A5B34D42-F34C-BDEF-7A59-CE31E9B29CC370282infoc&build=0&dl=0&f=u_0_0&orderid=0,3",
+          "ext": "m4a",
+          "acodec": "mp4a.40.2",
+          "vcodec": "none",
+          "tbr": 108.069,
+          "filesize": null,
+          "format_id": "30232",
+          "protocol": "https",
+          "audio_ext": "m4a",
+          "video_ext": "none",
+          "vbr": 0,
+          "abr": 108.069,
+          "resolution": "audio only",
+          "aspect_ratio": null,
+          "filesize_approx": 8491778,
+          "http_headers": {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "*/*",
+            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+            "Sec-Fetch-Mode": "navigate",
+            "Referer": "https://www.bilibili.com/video/BV1Nz5165EfK/?spm_id_from=333.1387.homepage.video_card.click&vd_source=608d1fc4ed09b2213ecdf1ce8f6122b2",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Origin": "https://www.bilibili.com"
+          },
+          "format": "30232 - audio only"
+        },
+        {
+          "url": "https://upos-sz-estgoss.bilivideo.com/upgcxcode/45/73/38302647345/38302647345-1-30280.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&og=ali&uipk=5&oi=1885414025&trid=11c607d71e324fc7b8e04936ca2a3b5u&mid=0&deadline=1781172711&platform=pc&nbs=1&gen=playurlv3&os=estgoss&upsig=287cc19425ba92c8d30c1522177c64d0&uparams=e,og,uipk,oi,trid,mid,deadline,platform,nbs,gen,os&bvc=vod&nettype=0&bw=226919&lrs=-1&build=0&dl=0&f=u_0_0&qn_dyeid=1844dd61c22e63d5009a540a6a2a6dc7&agrr=1&buvid=A5B34D42-F34C-BDEF-7A59-CE31E9B29CC370282infoc&orderid=0,3",
+          "ext": "m4a",
+          "acodec": "mp4a.40.2",
+          "vcodec": "none",
+          "tbr": 226.677,
+          "filesize": null,
+          "format_id": "30280",
+          "protocol": "https",
+          "audio_ext": "m4a",
+          "video_ext": "none",
+          "vbr": 0,
+          "abr": 226.677,
+          "resolution": "audio only",
+          "aspect_ratio": null,
+          "filesize_approx": 17811683,
+          "http_headers": {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "*/*",
+            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+            "Sec-Fetch-Mode": "navigate",
+            "Referer": "https://www.bilibili.com/video/BV1Nz5165EfK/?spm_id_from=333.1387.homepage.video_card.click&vd_source=608d1fc4ed09b2213ecdf1ce8f6122b2",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Origin": "https://www.bilibili.com"
+          },
+          "format": "30280 - audio only"
+        },
+        {
+          "url": "https://upos-sz-estgcos.bilivideo.com/upgcxcode/45/73/38302647345/38302647345-1-30016.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&mid=0&oi=1885414025&platform=pc&os=estgcos&og=cos&trid=11c607d71e324fc7b8e04936ca2a3b5u&nbs=1&deadline=1781172711&uipk=5&gen=playurlv3&upsig=93cafb322f71f47bd0684690eb6660e9&uparams=e,mid,oi,platform,os,og,trid,nbs,deadline,uipk,gen&bvc=vod&nettype=0&bw=68785&lrs=-1&build=0&dl=0&f=u_0_0&qn_dyeid=1844dd61c22e63d5009a540a6a2a6dc7&agrr=1&buvid=A5B34D42-F34C-BDEF-7A59-CE31E9B29CC370282infoc&orderid=0,3",
+          "ext": "mp4",
+          "fps": 29.665,
+          "width": 640,
+          "height": 342,
+          "vcodec": "avc1.64001E",
+          "acodec": "none",
+          "dynamic_range": "SDR",
+          "tbr": 68.697,
+          "filesize": null,
+          "quality": 16,
+          "format_id": "30016",
+          "format": "360P 流畅",
+          "protocol": "https",
+          "video_ext": "mp4",
+          "audio_ext": "none",
+          "abr": 0,
+          "vbr": 68.697,
+          "resolution": "640x342",
+          "aspect_ratio": 1.87,
+          "filesize_approx": 5398029,
+          "http_headers": {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "*/*",
+            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+            "Sec-Fetch-Mode": "navigate",
+            "Referer": "https://www.bilibili.com/video/BV1Nz5165EfK/?spm_id_from=333.1387.homepage.video_card.click&vd_source=608d1fc4ed09b2213ecdf1ce8f6122b2",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Origin": "https://www.bilibili.com"
+          }
+        },
+        {
+          "url": "https://upos-sz-estgoss.bilivideo.com/upgcxcode/45/73/38302647345/38302647345-1-100022.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&trid=11c607d71e324fc7b8e04936ca2a3b5u&gen=playurlv3&og=ali&uipk=5&oi=1885414025&platform=pc&mid=0&nbs=1&os=estgoss&deadline=1781172711&upsig=6932a7e7729380987547bdbe7e6ff469&uparams=e,trid,gen,og,uipk,oi,platform,mid,nbs,os,deadline&bvc=vod&nettype=0&bw=47054&lrs=-1&build=0&dl=0&f=u_0_0&qn_dyeid=1844dd61c22e63d5009a540a6a2a6dc7&agrr=1&buvid=A5B34D42-F34C-BDEF-7A59-CE31E9B29CC370282infoc&orderid=0,3",
+          "ext": "mp4",
+          "fps": 29.665,
+          "width": 640,
+          "height": 342,
+          "vcodec": "av01.0.00M.10.0.110.01.01.01.0",
+          "acodec": "none",
+          "dynamic_range": "SDR",
+          "tbr": 46.975,
+          "filesize": null,
+          "quality": 16,
+          "format_id": "100022",
+          "format": "360P 流畅",
+          "protocol": "https",
+          "video_ext": "mp4",
+          "audio_ext": "none",
+          "abr": 0,
+          "vbr": 46.975,
+          "resolution": "640x342",
+          "aspect_ratio": 1.87,
+          "filesize_approx": 3691172,
+          "http_headers": {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "*/*",
+            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+            "Sec-Fetch-Mode": "navigate",
+            "Referer": "https://www.bilibili.com/video/BV1Nz5165EfK/?spm_id_from=333.1387.homepage.video_card.click&vd_source=608d1fc4ed09b2213ecdf1ce8f6122b2",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Origin": "https://www.bilibili.com"
+          }
+        },
+        {
+          "url": "https://upos-sz-mirrorcos.bilivideo.com/upgcxcode/45/73/38302647345/38302647345-1-30032.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&trid=11c607d71e324fc7b8e04936ca2a3b5u&platform=pc&gen=playurlv3&os=cosbv&og=hw&mid=0&nbs=1&deadline=1781172711&uipk=5&oi=1885414025&upsig=43674dce64e1ed411628afa5db6f9296&uparams=e,trid,platform,gen,os,og,mid,nbs,deadline,uipk,oi&bvc=vod&nettype=0&bw=109925&lrs=-1&build=0&dl=0&f=u_0_0&qn_dyeid=1844dd61c22e63d5009a540a6a2a6dc7&agrr=1&buvid=A5B34D42-F34C-BDEF-7A59-CE31E9B29CC370282infoc&orderid=0,3",
+          "ext": "mp4",
+          "fps": 29.665,
+          "width": 854,
+          "height": 456,
+          "vcodec": "avc1.64001F",
+          "acodec": "none",
+          "dynamic_range": "SDR",
+          "tbr": 109.796,
+          "filesize": null,
+          "quality": 32,
+          "format_id": "30032",
+          "format": "480P 标清",
+          "protocol": "https",
+          "video_ext": "mp4",
+          "audio_ext": "none",
+          "abr": 0,
+          "vbr": 109.796,
+          "resolution": "854x456",
+          "aspect_ratio": 1.87,
+          "filesize_approx": 8627481,
+          "http_headers": {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "*/*",
+            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+            "Sec-Fetch-Mode": "navigate",
+            "Referer": "https://www.bilibili.com/video/BV1Nz5165EfK/?spm_id_from=333.1387.homepage.video_card.click&vd_source=608d1fc4ed09b2213ecdf1ce8f6122b2",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Origin": "https://www.bilibili.com"
+          }
+        },
+        {
+          "url": "https://upos-sz-mirror08c.bilivideo.com/upgcxcode/45/73/38302647345/38302647345-1-100023.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&os=08cbv&trid=11c607d71e324fc7b8e04936ca2a3b5u&mid=0&deadline=1781172711&uipk=5&og=hw&oi=1885414025&platform=pc&nbs=1&gen=playurlv3&upsig=d89007ad0612f7bc798a70550730dc7d&uparams=e,os,trid,mid,deadline,uipk,og,oi,platform,nbs,gen&bvc=vod&nettype=0&bw=72116&lrs=-1&agrr=1&buvid=A5B34D42-F34C-BDEF-7A59-CE31E9B29CC370282infoc&build=0&dl=0&f=u_0_0&qn_dyeid=1844dd61c22e63d5009a540a6a2a6dc7&orderid=0,3",
+          "ext": "mp4",
+          "fps": 29.665,
+          "width": 854,
+          "height": 456,
+          "vcodec": "av01.0.00M.10.0.110.01.01.01.0",
+          "acodec": "none",
+          "dynamic_range": "SDR",
+          "tbr": 72.012,
+          "filesize": null,
+          "quality": 32,
+          "format_id": "100023",
+          "format": "480P 标清",
+          "protocol": "https",
+          "video_ext": "mp4",
+          "audio_ext": "none",
+          "abr": 0,
+          "vbr": 72.012,
+          "resolution": "854x456",
+          "aspect_ratio": 1.87,
+          "filesize_approx": 5658513,
+          "http_headers": {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "*/*",
+            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+            "Sec-Fetch-Mode": "navigate",
+            "Referer": "https://www.bilibili.com/video/BV1Nz5165EfK/?spm_id_from=333.1387.homepage.video_card.click&vd_source=608d1fc4ed09b2213ecdf1ce8f6122b2",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Origin": "https://www.bilibili.com"
+          }
+        }
+      ],
+      "duration": 628.619,
+      "chapters": [
+        {
+          "title": "技能项目介绍",
+          "start_time": 0,
+          "end_time": 17
+        },
+        {
+          "title": "工作流程详解",
+          "start_time": 17,
+          "end_time": 73
+        },
+        {
+          "title": "技能封装与打包",
+          "start_time": 73,
+          "end_time": 147
+        },
+        {
+          "title": "交互式使用演示",
+          "start_time": 147,
+          "end_time": 300
+        },
+        {
+          "title": "交互式过程详解",
+          "start_time": 300,
+          "end_time": 392
+        },
+        {
+          "title": "成果展示与总结",
+          "start_time": 392,
+          "end_time": 629
+        }
+      ],
+      "subtitles": {},
+      "webpage_url": "https://www.bilibili.com/video/BV1Nz5165EfK/?spm_id_from=333.1387.homepage.video_card.click&vd_source=608d1fc4ed09b2213ecdf1ce8f6122b2",
+      "original_url": "https://www.bilibili.com/video/BV1Nz5165EfK/?spm_id_from=333.1387.homepage.video_card.click&vd_source=608d1fc4ed09b2213ecdf1ce8f6122b2",
+      "webpage_url_basename": "BV1Nz5165EfK",
+      "webpage_url_domain": "bilibili.com",
+      "extractor": "BiliBili",
+      "extractor_key": "BiliBili",
+      "playlist": null,
+      "playlist_index": null,
+      "thumbnails": [
+        {
+          "url": "http://i2.hdslb.com/bfs/archive/6ce3358954f521eef84b78cfb755e07ed63744ac.jpg",
+          "id": "0"
+        }
+      ],
+      "display_id": "BV1Nz5165EfK",
+      "fulltitle": "workbuddy应用挑战赛（PPT大师）",
+      "duration_string": "10:28",
+      "upload_date": "20260513",
+      "release_year": null,
+      "requested_subtitles": null,
+      "_has_drm": null,
+      "epoch": 1781165511,
+      "requested_downloads": [
+        {
+          "http_headers": {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "*/*",
+            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+            "Sec-Fetch-Mode": "navigate",
+            "Referer": "https://www.bilibili.com/video/BV1Nz5165EfK/?spm_id_from=333.1387.homepage.video_card.click&vd_source=608d1fc4ed09b2213ecdf1ce8f6122b2",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Origin": "https://www.bilibili.com"
+          },
+          "url": "https://upos-sz-estgoss.bilivideo.com/upgcxcode/45/73/38302647345/38302647345-1-30280.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&og=ali&uipk=5&oi=1885414025&trid=11c607d71e324fc7b8e04936ca2a3b5u&mid=0&deadline=1781172711&platform=pc&nbs=1&gen=playurlv3&os=estgoss&upsig=287cc19425ba92c8d30c1522177c64d0&uparams=e,og,uipk,oi,trid,mid,deadline,platform,nbs,gen,os&bvc=vod&nettype=0&bw=226919&lrs=-1&build=0&dl=0&f=u_0_0&qn_dyeid=1844dd61c22e63d5009a540a6a2a6dc7&agrr=1&buvid=A5B34D42-F34C-BDEF-7A59-CE31E9B29CC370282infoc&orderid=0,3",
+          "ext": "mp3",
+          "acodec": "mp4a.40.2",
+          "vcodec": "none",
+          "tbr": 226.677,
+          "format_id": "30280",
+          "protocol": "https",
+          "audio_ext": "m4a",
+          "video_ext": "none",
+          "vbr": 0,
+          "abr": 226.677,
+          "resolution": "audio only",
+          "filesize_approx": 17811683,
+          "format": "30280 - audio only",
+          "_filename": "/app/data/data/BV1Nz5165EfK.m4a",
+          "filename": "/app/data/data/BV1Nz5165EfK.m4a",
+          "__postprocessors": [],
+          "__real_download": true,
+          "__finaldir": "/app/data/data",
+          "filepath": "/app/data/data/BV1Nz5165EfK.mp3",
+          "__write_download_archive": true
+        }
+      ],
+      "url": "https://upos-sz-estgoss.bilivideo.com/upgcxcode/45/73/38302647345/38302647345-1-30280.m4s?e=ig8euxZM2rNcNbdlhoNvNC8BqJIzNbfqXBvEqxTEto8BTrNvN0GvT90W5JZMkX_YN0MvXg8gNEV4NC8xNEV4N03eN0B5tZlqNxTEto8BTrNvNeZVuJ10Kj_g2UB02J0mN0B5tZlqNCNEto8BTrNvNC7MTX502C8f2jmMQJ6mqF2fka1mqx6gqj0eN0B599M=&og=ali&uipk=5&oi=1885414025&trid=11c607d71e324fc7b8e04936ca2a3b5u&mid=0&deadline=1781172711&platform=pc&nbs=1&gen=playurlv3&os=estgoss&upsig=287cc19425ba92c8d30c1522177c64d0&uparams=e,og,uipk,oi,trid,mid,deadline,platform,nbs,gen,os&bvc=vod&nettype=0&bw=226919&lrs=-1&build=0&dl=0&f=u_0_0&qn_dyeid=1844dd61c22e63d5009a540a6a2a6dc7&agrr=1&buvid=A5B34D42-F34C-BDEF-7A59-CE31E9B29CC370282infoc&orderid=0,3",
+      "ext": "m4a",
+      "acodec": "mp4a.40.2",
+      "vcodec": "none",
+      "tbr": 226.677,
+      "filesize": null,
+      "format_id": "30280",
+      "protocol": "https",
+      "audio_ext": "m4a",
+      "video_ext": "none",
+      "vbr": 0,
+      "abr": 226.677,
+      "resolution": "audio only",
+      "aspect_ratio": null,
+      "filesize_approx": 17811683,
+      "format": "30280 - audio only"
+    },
+    "video_path": null
+  }
+}

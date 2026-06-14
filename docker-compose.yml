@@ -17,10 +17,10 @@ services:
       - BACKEND_HOST=${BACKEND_HOST}
     volumes:
       # 把整个 backend/ 目录绑到 /app，意味着这些都持久化到宿主机、删容器不丢：
-      #   ./backend/noteflow.db                 — SQLite 数据库（含 LLM 供应商配置、笔记历史）
-      #   ./backend/config/transcriber.json     — 转写器运行时配置
-      #   ./backend/static/screenshots/         — 视频截图
-      #   ./backend/uploads/                    — 上传的本地视频
+      #   ./backend/data/noteflow.db              — SQLite 数据库（含 LLM 供应商配置、笔记历史）
+      #   ./backend/data/notes/                   — 生成的 Markdown 笔记
+      #   ./backend/data/screenshots/             — 视频截图
+      #   ./backend/uploads/                      — 上传的本地视频
       - ./backend:/app
     expose:
       - "${BACKEND_PORT}"  # 不再对外暴露，用于 nginx 内部通信

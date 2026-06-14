@@ -3,18 +3,19 @@ import re
 from urllib.parse import quote
 from markdown_pdf import MarkdownPdf, Section
 from dotenv import load_dotenv
+from app.utils.path_helper import get_exports_dir
 
 load_dotenv()
 
 # 项目根路径（无论你在哪里运行）
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+BASE_DIR = os.getcwd()
 
-# 从 .env 获取 DATA_DIR，相对于 BASE_DIR 解析
-DATA_DIR_NAME = os.getenv("DATA_DIR", "data")
-DATA_DIR = os.path.join(BASE_DIR, DATA_DIR_NAME)
-SAVE_PATH = os.path.join(DATA_DIR, "note_output")
-IMAGE_BASE_URL = os.getenv("IMAGE_BASE_URL")
-STATIC_BASE = os.path.join(BASE_DIR, IMAGE_BASE_URL)
+# 图片静态文件目录（用于 base64 转换时查找本地文件）
+IMAGE_BASE_URL = os.getenv("IMAGE_BASE_URL", "/static/screenshots")
+STATIC_BASE = os.path.join(BASE_DIR, (IMAGE_BASE_URL or "/static/screenshots").lstrip('/'))
+
+# 导出保存路径统一到 data/exports/
+SAVE_PATH = get_exports_dir()
 
 
 class ExportUtils:

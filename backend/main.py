@@ -18,22 +18,21 @@ from app import create_app
 from app.services.transcriber_config_manager import TranscriberConfigManager
 from events import register_handler
 from ffmpeg_helper import ensure_ffmpeg_or_raise
+from app.utils.path_helper import get_screenshots_dir
 
 logger = get_logger(__name__)
 load_dotenv()
 
-# 读取 .env 中的路径
+# 读取 .env 中的路径（如有自定义则用自定义，否则统一到 data/ 下）
 static_path = os.getenv('STATIC', '/static')
-out_dir = os.getenv('OUT_DIR', './static/screenshots')
+out_dir = os.getenv('OUT_DIR', get_screenshots_dir())
 
-# 自动创建本地目录（static 和 static/screenshots）
-static_dir = "static"
+# 自动创建本地目录
 uploads_dir = "uploads"
-if not os.path.exists(static_dir):
-    os.makedirs(static_dir)
+if not os.path.exists("data"):
+    os.makedirs("data")
 if not os.path.exists(uploads_dir):
     os.makedirs(uploads_dir)
-
 if not os.path.exists(out_dir):
     os.makedirs(out_dir)
 
@@ -91,7 +90,7 @@ app.add_middleware(
 )
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 register_exception_handlers(app)
-app.mount(static_path, StaticFiles(directory=static_dir), name="static")
+app.mount("/static/screenshots", StaticFiles(directory=out_dir), name="static_screenshots")
 app.mount("/uploads", StaticFiles(directory=uploads_dir), name="uploads")
 
 

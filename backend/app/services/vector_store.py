@@ -10,8 +10,10 @@ from app.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
-NOTE_OUTPUT_DIR = os.getenv("NOTE_OUTPUT_DIR", "note_results")
-VECTOR_DB_DIR = os.getenv("VECTOR_DB_DIR", "vector_db")
+from app.utils.path_helper import get_notes_dir, get_vector_db_dir
+
+NOTE_OUTPUT_DIR = os.getenv("NOTE_OUTPUT_DIR", get_notes_dir())
+VECTOR_DB_DIR = os.getenv("VECTOR_DB_DIR", get_vector_db_dir())
 
 
 def _chunk_markdown(markdown: str) -> list[dict]:
