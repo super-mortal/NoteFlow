@@ -8,10 +8,8 @@
 
 ```
 develop  ──→  release/X.Y.Z  ──→  PR ─→  master  ──→  打 tag vX.Y.Z
-                  │                    │                    │
-                  └──→ PR 回灌 ──→ develop                   └──→ CI 自动构建插件产物 + 挂到 GitHub Release
-                                                                  ↓
-                                                                  人工上传商店（Chrome/Edge/Firefox）
+                  │                    │
+                  └──→ PR 回灌 ──→ develop
 ```
 
 ---
@@ -65,45 +63,16 @@ git tag -a vX.Y.Z -m "NoteFlow vX.Y.Z
 git push origin vX.Y.Z
 ```
 
-push tag **会自动触发 [`.github/workflows/release-extension.yml`](.github/workflows/release-extension.yml)**：构建插件并把 `.zip` / `.xpi` / `.crx` 挂到对应 GitHub Release。
-
 ## 5. 创建 GitHub Release（如果还没有）
 
-CI 默认会创建 / 更新 `vX.Y.Z` 对应的 Release。如果你想自己写 release notes：
+如果你想自己写 release notes：
 
 1. 打开 https://github.com/super-mortal/NoteFlow/releases/new
 2. Tag: 选 `vX.Y.Z`
 3. Title: `vX.Y.Z`
 4. Body: 直接贴 [`CHANGELOG.md`](./CHANGELOG.md) 的对应段
-5. CI 跑完后 Release 页面会自动出现 `noteflow-extension-X.Y.Z.zip` / `.xpi` / `.crx`
 
-## 6. 上传到各商店（人工）
-
-商店审核普遍 1-3 个工作日。建议**先上 Chrome → Edge → Firefox**（Edge 接受同一份 zip）。
-
-### Chrome Web Store
-
-1. https://chrome.google.com/webstore/devconsole
-2. 选 NoteFlow → 左侧 **Package** → **Upload new package**
-3. 上传 `noteflow-extension-X.Y.Z.zip`
-4. 检查 listing（描述 / 图标 / 截图无变化可保持），点 **Submit for review**
-
-### Microsoft Edge Add-ons
-
-1. https://partner.microsoft.com/dashboard/microsoftedge
-2. 选 NoteFlow → **New submission**
-3. 上传同一份 `.zip`（Edge Add-ons 与 Chrome 完全兼容 MV3）
-4. 提交审核
-
-### Firefox Add-ons (AMO)
-
-1. https://addons.mozilla.org/developers/
-2. 选 NoteFlow → **Upload New Version**
-3. 上传 `noteflow-extension-X.Y.Z.xpi`
-4. 选择"在 AMO 公开"或"自托管"
-5. 提交审核
-
-### 桌面端 (Tauri)
+## 6. 桌面端 (Tauri)
 
 仓库已有 GitHub Actions 在 `v*` tag 时构建桌面端安装包并自动挂到 GitHub Release，无需额外操作。
 
@@ -114,27 +83,6 @@ CI 默认会创建 / 更新 `vX.Y.Z` 对应的 Release。如果你想自己写 r
 git push origin --delete release/X.Y.Z
 git branch -d release/X.Y.Z
 ```
-
----
-
-## 自动发布到商店（可选）
-
-`.github/workflows/release-extension.yml` 末尾有三段商店自动发布的 job 注释。要启用：
-
-1. 在 https://github.com/super-mortal/NoteFlow/settings/secrets/actions 加 secrets：
-
-| 商店 | 需要的 secret |
-|---|---|
-| Chrome | `CHROME_EXTENSION_ID`、`CHROME_CLIENT_ID`、`CHROME_CLIENT_SECRET`、`CHROME_REFRESH_TOKEN` |
-| Edge | `EDGE_PRODUCT_ID`、`EDGE_CLIENT_ID`、`EDGE_API_KEY` |
-| Firefox | `FIREFOX_ADDON_UUID`、`FIREFOX_API_KEY`、`FIREFOX_API_SECRET` |
-
-2. 解开 workflow 文件末尾的 `publish-chrome` / `publish-edge` / `publish-firefox` job 注释。
-3. 推 tag 时即自动发布。
-
-> Chrome 各 secret 的获取方式：[chrome-webstore-upload-cli 文档](https://github.com/fregante/chrome-webstore-upload-cli/blob/main/How%20to%20generate%20Google%20API%20keys.md)
-> Edge：[Edge Add-ons API](https://learn.microsoft.com/en-us/microsoft-edge/extensions-chromium/publish/api/using-addons-api)
-> Firefox：https://addons.mozilla.org/en-US/developers/addon/api/key/
 
 ---
 

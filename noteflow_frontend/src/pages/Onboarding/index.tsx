@@ -340,9 +340,6 @@ const Onboarding = () => {
               <br />
               YouTube 一般不需要 cookie。先跳过也没问题，到时再去配。
             </p>
-            <div className="rounded bg-gray-50 p-3 text-xs text-gray-600">
-              提示：插件版（<a className="text-blue-600 underline" href="https://github.com/super-mortal/NoteFlow/tree/develop/BillNote_extension" target="_blank" rel="noreferrer">BillNote_extension</a>）支持一键 cookie 同步；桌面版需手动复制。
-            </div>
             <div className="flex gap-2 justify-between">
               <button className="text-sm text-gray-500 hover:text-gray-800" onClick={prev}>上一步</button>
               <button className="px-4 py-1.5 text-sm rounded bg-blue-600 text-white hover:bg-blue-700" onClick={finish}>

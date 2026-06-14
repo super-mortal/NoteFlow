@@ -69,8 +69,7 @@ async def lifespan(app: FastAPI):
 
 app = create_app(lifespan=lifespan)
 
-# 允许的源：本地 web 端 + Tauri 桌面端 + 浏览器扩展（chrome/edge/firefox）
-# 用 regex 是因为 chrome-extension://<id> 的 id 在每次开发版加载时不固定
+# 允许的源：本地 Web 端 + Tauri 桌面端
 # Tauri 2 不同平台 webview origin 不一样，必须全列：
 #   - macOS:   tauri://localhost  （自定义协议）
 #   - Windows: https://tauri.localhost  （Edge WebView2）
@@ -78,9 +77,7 @@ app = create_app(lifespan=lifespan)
 # 漏掉哪个都会导致桌面端 fetch 返回 200 但 browser 因为 CORS 拒绝读响应，
 # 表现为前端「连不上后端」但后端日志一片 200 OK。
 CORS_ORIGIN_REGEX = (
-    r"^chrome-extension://[a-z]+$"
-    r"|^moz-extension://.+$"
-    r"|^http://(localhost|127\.0\.0\.1)(:\d+)?$"
+    r"^http://(localhost|127\.0\.0\.1)(:\d+)?$"
     r"|^tauri://localhost$"
     r"|^https?://tauri\.localhost$"
 )
