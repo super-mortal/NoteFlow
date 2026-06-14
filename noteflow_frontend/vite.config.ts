@@ -8,7 +8,7 @@ import tailwindcss from '@tailwindcss/vite'
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 function readAppVersion() {
-  const fallbackVersion = '0.0.0'
+  const fallbackVersion = '0.2.1'
 
   try {
     const tauriConfigPath = path.resolve(__dirname, 'src-tauri/tauri.conf.json')

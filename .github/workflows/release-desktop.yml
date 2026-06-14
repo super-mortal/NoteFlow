@@ -1,0 +1,114 @@
+name: Release Desktop Apps
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: ${{ matrix.label }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            label: Windows (x64)
+            exe_ext: .exe
+            rust_target: []
+
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            label: macOS (ARM / Apple Silicon)
+            exe_ext: ''
+            rust_target: ['--target', 'aarch64-apple-darwin']
+
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            label: macOS (Intel)
+            exe_ext: ''
+            rust_target: ['--target', 'x86_64-apple-darwin']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: noteflow_frontend/pnpm-lock.yaml
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Install Python dependencies
+        working-directory: backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Build backend (PyInstaller)
+        shell: bash
+        run: |
+          set -e
+          cp .env.example backend/.env
+
+          pyinstaller \
+            -y \
+            --name NoteFlowBackend \
+            --paths backend \
+            --distpath noteflow_frontend/src-tauri/bin \
+            --workpath backend/build \
+            --specpath backend \
+            --hidden-import uvicorn \
+            --hidden-import fastapi \
+            --hidden-import starlette \
+            --add-data "app/db/builtin_providers.json:." \
+            --add-data ".env:." \
+            backend/main.py
+
+          rm -f backend/.env
+
+          mkdir -p noteflow_frontend/src-tauri/bin/NoteFlowBackend
+
+          SRC="noteflow_frontend/src-tauri/bin/NoteFlowBackend/NoteFlowBackend${{ matrix.exe_ext }}"
+          DST="noteflow_frontend/src-tauri/bin/NoteFlowBackend/NoteFlowBackend-${{ matrix.target }}${{ matrix.exe_ext }}"
+          echo "SRC: $SRC"
+          echo "DST: $DST"
+          ls noteflow_frontend/src-tauri/bin/NoteFlowBackend/ || true
+          mv "$SRC" "$DST"
+          echo "Backend binary ready: $DST"
+          ls -la noteflow_frontend/src-tauri/bin/NoteFlowBackend/
+
+      - name: Install frontend dependencies
+        working-directory: noteflow_frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Tauri & create release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VITE_API_BASE_URL: http://127.0.0.1:8483
+          VITE_SCREENSHOT_BASE_URL: http://127.0.0.1:8483/static/screenshots
+          VITE_FRONTEND_PORT: '3015'
+        with:
+          projectPath: noteflow_frontend
+          tagName: ${{ github.ref_name }}
+          releaseName: 'NoteFlow ${{ github.ref_name }}'
+          releaseBody: 'See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/docs/changelog/V0.x.x.md) for details.'
+          releaseDraft: false
+          prerelease: false
+          args: ${{ matrix.rust_target && format('--target {0}', matrix.target) || '' }}

@@ -40,7 +40,7 @@ ARG VITE_APP_VERSION=
 ENV VITE_APP_VERSION=${VITE_APP_VERSION}
 
 # pnpm 版本 pin 到 9 系列：
-# - lockfile (BillNote_frontend/pnpm-lock.yaml) 是 lockfileVersion '9.0'，由 pnpm 9 生成
+# - lockfile (noteflow_frontend/pnpm-lock.yaml) 是 lockfileVersion '9.0'，由 pnpm 9 生成
 # - pnpm 11+ 要求 Node 22+，与 node:20 不兼容（ERR_UNKNOWN_BUILTIN_MODULE）
 # - 不用 @latest 避免上游 pnpm 升级悄悄破坏 CI
 RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
