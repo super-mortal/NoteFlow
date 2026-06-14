@@ -1,6 +1,6 @@
 <div style="display: flex; justify-content: center; align-items: center; gap: 10px;">
     <p align="center">
-  <img src="./doc/icon.png" alt="NoteFlow Logo" width="50" height="50" />
+  <img src="./noteflow_frontend/public/icon.png" alt="NoteFlow Logo" width="50" height="50" />
 </p>
 <h1 align="center" > NoteFlow v0.0.0</h1>
 </div>

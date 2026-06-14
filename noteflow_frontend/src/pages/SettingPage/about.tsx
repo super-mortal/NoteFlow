@@ -274,8 +274,9 @@ export default function AboutPage() {
                 {[
                   { step: '1', title: '克隆仓库', code: 'git clone https://github.com/super-mortal/NoteFlow.git\ncd NoteFlow\ncp .env.example .env' },
                   { step: '2', title: '启动后端', code: 'cd backend\npip install -r requirements.txt\npython main.py' },
-                  { step: '3', title: '启动前端', code: 'cd BillNote_frontend\npnpm install\npnpm dev' },
+                  { step: '3', title: '启动前端', code: 'cd noteflow_frontend\npnpm install\npnpm dev' },
                   { step: '4', title: '访问应用', code: '访问 http://localhost:3015' },
+                  { step: '5', title: '安装 FFmpeg（必需）', code: '后端依赖 FFmpeg 处理音视频，请先安装：\n👉 https://ffmpeg.org/download.html\nWindows 推荐：https://www.gyan.dev/ffmpeg/builds/\n已安装但未加入 PATH 时，可在 .env 中指定：\nFFMPEG_BIN_PATH=/your/custom/ffmpeg/bin' },
                 ].map((item) => (
                   <div key={item.step} className="flex gap-4">
                     <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-light text-xs font-semibold text-primary">
@@ -311,12 +312,12 @@ export default function AboutPage() {
             <p className="text-text-tertiary text-xs">
               你的支持与反馈是我持续优化的动力 —
               <a
-                href="https://github.com/super-mortal/NoteFlow"
+                href="https://github.com/super-mortal/NoteFlow/issues"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="ml-1 text-primary hover:underline"
               >
-                Star &amp; PR Welcome
+                反馈与建议
                 <ExternalLink className="ml-0.5 inline-block h-3 w-3" />
               </a>
             </p>
