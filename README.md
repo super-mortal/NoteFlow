@@ -176,7 +176,19 @@ pnpm dev
 ## 备注
 
 > NoteFlow的 V0.0.0 版本是基于 BiliNote 的V2.4.0版本开发的，**f5bfb43619d001a0f0fe03b3830068cb719db5e8**
-  此后的版本由我独立自主开发。完整更新记录见 [docs/changelog/](docs/changelog/)。
+  此后的版本由我独立自主开发。完整更新记录见 [docs/changelog/](docs/changelog/) 
+
+---
+
+## 🤝 贡献指南
+
+ **v1.0.0 版本发布于 2026.06.15**
+
+欢迎提交 Issue 和 Pull Request！任何形式的贡献都非常感谢：
+
+- **🐛 发现 Bug**：请提交 [GitHub Issue](https://github.com/super-mortal/NoteFlow/issues)，描述复现步骤和环境
+- **💡 新功能建议**：在 Issue 中说明你的设想，我们一起讨论实现方案
+- **🔧 提交 PR**：Fork 仓库 → 创建特性分支 → 提交 PR，我会及时 review
 
 ---
 
