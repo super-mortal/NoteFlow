@@ -27,7 +27,7 @@ import {
 import logo from '@/assets/icon.png'
 import { useInView } from 'react-intersection-observer'
 
-const DISPLAY_VERSION = '0.2.1'
+const DISPLAY_VERSION = __APP_VERSION__
 
 /* ── A simple fade-in-up wrapper ── */
 function FadeInSection({

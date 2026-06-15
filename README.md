@@ -2,7 +2,7 @@
     <p align="center">
   <img src="./noteflow_frontend/public/icon.png" alt="NoteFlow Logo" width="50" height="50" />
 </p>
-<h1 align="center" > NoteFlow v0.0.0</h1>
+<h1 align="center" > NoteFlow <img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2Fsuper-mortal%2FNoteFlow%2Fmain%2Fnoteflow_frontend%2Fsrc-tauri%2Ftauri.conf.json&query=%24.version&style=flat&label=%20" alt="version" /></h1>
 </div>
 
 <p align="center"><i>让碎片知识，流动成笔记 —— NoteFlow</i></p>
