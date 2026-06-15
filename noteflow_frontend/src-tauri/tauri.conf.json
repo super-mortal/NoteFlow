@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "NoteFlow",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "identifier": "com.jefferyhuang.noteflow",
   "build": {
     "frontendDist": "../dist",
@@ -29,7 +29,7 @@
       "bin/NoteFlowBackend/NoteFlowBackend"
     ],
     "resources": {
-    "bin/NoteFlowBackend/_internal":"_internal"
+    "bin/NoteFlowBackend/_internal":"bin/NoteFlowBackend/_internal"
     },
     "active": true,
     "targets": "all",
