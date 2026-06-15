@@ -32,4 +32,3 @@ tauri-plugin-process = "2"
 [package.metadata.tauri.bundle.macOS]
 frameworks = ["bin/NoteFlowBackend/_internal/"]
 
-

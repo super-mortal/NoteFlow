@@ -21,20 +21,6 @@ jobs:
             rust_target: []
             updater_platform: windows-x86_64
 
-          - os: macos-latest
-            target: aarch64-apple-darwin
-            label: macOS (ARM / Apple Silicon)
-            exe_ext: ''
-            rust_target: ['--target', 'aarch64-apple-darwin']
-            updater_platform: darwin-aarch64
-
-          - os: macos-latest
-            target: x86_64-apple-darwin
-            label: macOS (Intel)
-            exe_ext: ''
-            rust_target: ['--target', 'x86_64-apple-darwin']
-            updater_platform: darwin-x86_64
-
     steps:
       - uses: actions/checkout@v4
 
@@ -56,10 +42,30 @@ jobs:
         with:
           targets: ${{ matrix.target }}
 
+      - name: Cache Python pip
+        uses: actions/cache@v4
+        with:
+          path: ~\AppData\Local\pip\Cache
+          key: pip-${{ runner.os }}-${{ hashFiles('backend/requirements.txt') }}
+          restore-keys: |
+            pip-${{ runner.os }}-
+
+      - name: Cache Cargo (Rust) dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            noteflow_frontend/src-tauri/target
+          key: cargo-${{ runner.os }}-${{ hashFiles('noteflow_frontend/src-tauri/Cargo.lock') }}
+          restore-keys: |
+            cargo-${{ runner.os }}-
+
       - name: Install Python dependencies
         working-directory: backend
         run: |
           python -m pip install --upgrade pip
+          pip install "setuptools<74"
           pip install -r requirements.txt
           pip install pyinstaller
 
@@ -71,6 +77,7 @@ jobs:
 
           pyinstaller \
             -y \
+            --noconsole \
             --name NoteFlowBackend \
             --paths backend \
             --distpath noteflow_frontend/src-tauri/bin \
@@ -212,7 +219,7 @@ jobs:
           cat > update.json <<EOF
           {
             "version": "${VERSION}",
-            "notes": "See https://github.com/${REPO}/blob/main/docs/changelog/V0.x.x.md for details.",
+            "notes": "See https://github.com/${REPO}/blob/main/docs/changelog/V1.x.x.md for details.",
             "pub_date": "${TIMESTAMP}",
             "platforms": ${PLATFORMS}
           }
