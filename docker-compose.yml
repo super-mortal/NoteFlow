@@ -9,7 +9,7 @@ services:
         BASE_REGISTRY: ${BASE_REGISTRY:-docker.io}
         APT_MIRROR: ${APT_MIRROR:-mirrors.tuna.tsinghua.edu.cn}
         PIP_INDEX: ${PIP_INDEX:-https://pypi.tuna.tsinghua.edu.cn/simple}
-    image: ghcr.io/super-mortal/noteflow/backend:latest
+    image: ghcr.io/super-mortal/noteflow-backend:latest
     env_file:
       - .env
     environment:
@@ -36,7 +36,7 @@ services:
       dockerfile: noteflow_frontend/Dockerfile
       args:
         BASE_REGISTRY: ${BASE_REGISTRY:-docker.io}
-    image: ghcr.io/super-mortal/noteflow/frontend:latest
+    image: ghcr.io/super-mortal/noteflow-frontend:latest
     env_file:
       - .env
     expose:

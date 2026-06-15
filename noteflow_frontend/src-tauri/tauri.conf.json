@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "NoteFlow",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "identifier": "com.jefferyhuang.noteflow",
   "build": {
     "frontendDist": "../dist",
@@ -30,11 +30,6 @@
     ],
     "resources": {
     "bin/NoteFlowBackend/_internal":"_internal"
-    },
-    "macOS":{
-      "files": {
-               "Frameworks": "bin/NoteFlowBackend/_internal"
-      }
     },
     "active": true,
     "targets": "all",

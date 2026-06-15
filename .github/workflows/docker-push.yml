@@ -35,8 +35,8 @@ jobs:
           file: backend/Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ env.REPO_LOWER }}/backend:latest
-            ghcr.io/${{ env.REPO_LOWER }}/backend:${{ env.VERSION }}
+            ghcr.io/${{ env.REPO_LOWER }}-backend:latest
+            ghcr.io/${{ env.REPO_LOWER }}-backend:${{ env.VERSION }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -47,8 +47,8 @@ jobs:
           file: noteflow_frontend/Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ env.REPO_LOWER }}/frontend:latest
-            ghcr.io/${{ env.REPO_LOWER }}/frontend:${{ env.VERSION }}
+            ghcr.io/${{ env.REPO_LOWER }}-frontend:latest
+            ghcr.io/${{ env.REPO_LOWER }}-frontend:${{ env.VERSION }}
           build-args: |
             VITE_APP_VERSION=${{ env.VERSION }}
           cache-from: type=gha
