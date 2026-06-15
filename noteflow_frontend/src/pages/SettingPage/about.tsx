@@ -502,7 +502,7 @@ export default function AboutPage() {
                 {[
                   { step: '1', title: '克隆仓库', code: 'git clone https://github.com/super-mortal/NoteFlow.git\ncd NoteFlow\ncp .env.example .env' },
                   { step: '2', title: '启动 Docker Compose', code: 'docker compose up --build -d' },
-                  { step: '3', title: '访问应用', code: '访问 http://localhost:3015' },
+                  { step: '3', title: '访问应用', code: '访问 http://localhost:3015\n（部署到远程服务器时，将 localhost 替换为服务器 IP）' },
                 ].map((item) => (
                   <div key={item.step} className="flex gap-4">
                     <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-light text-xs font-semibold text-primary">

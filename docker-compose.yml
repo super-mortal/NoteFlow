@@ -67,6 +67,7 @@ services:
     environment:
       - WATCHTOWER_CLEANUP=true
       - WATCHTOWER_POLL_INTERVAL=86400
+      - DOCKER_API_VERSION=1.40
     command: noteflow-backend noteflow-frontend noteflow-nginx
     restart: unless-stopped
     mem_limit: 64m

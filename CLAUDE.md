@@ -85,6 +85,8 @@ cd noteflow_frontend && pnpm tauri build
 
 **重要规则**：仅在用户明确发出"写入更新日志"或"更新 changelog"等指令时，才写入更新日志。不要在执行代码修改后自动写入，等待用户主动要求。
 
+**版本同步规则**：当用户要求写入或更新更新日志时，将 `noteflow_frontend/src-tauri/tauri.conf.json` 中的 `version` 字段同步更新为对应的版本号（如更新日志写的是 `[0.3.0]`，`version` 就改为 `0.3.0`），保持两者一致。
+
 ## Code Style
 
 - **Frontend**: ESLint + Prettier (2 spaces, single quotes, 100 char width, Tailwind plugin). TypeScript strict mode.
