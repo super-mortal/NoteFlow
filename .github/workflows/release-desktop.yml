@@ -19,18 +19,21 @@ jobs:
             label: Windows (x64)
             exe_ext: .exe
             rust_target: []
+            updater_platform: windows-x86_64
 
           - os: macos-latest
             target: aarch64-apple-darwin
             label: macOS (ARM / Apple Silicon)
             exe_ext: ''
             rust_target: ['--target', 'aarch64-apple-darwin']
+            updater_platform: darwin-aarch64
 
           - os: macos-latest
             target: x86_64-apple-darwin
             label: macOS (Intel)
             exe_ext: ''
             rust_target: ['--target', 'x86_64-apple-darwin']
+            updater_platform: darwin-x86_64
 
     steps:
       - uses: actions/checkout@v4
@@ -104,6 +107,8 @@ jobs:
           VITE_API_BASE_URL: http://127.0.0.1:8483
           VITE_SCREENSHOT_BASE_URL: http://127.0.0.1:8483/static/screenshots
           VITE_FRONTEND_PORT: '3015'
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
         with:
           projectPath: noteflow_frontend
           tagName: ${{ github.ref_name }}
@@ -112,3 +117,112 @@ jobs:
           releaseDraft: false
           prerelease: false
           args: ${{ matrix.rust_target && format('--target {0}', matrix.target) || '' }}
+
+      - name: Extract signature
+        shell: bash
+        run: |
+          # tauri-action v0 会在产物同目录生成 .sig 签名文件
+          # 尝试常见路径
+          ARTIFACT_DIR="noteflow_frontend/src-tauri/target/release"
+          if [ -d "noteflow_frontend/src-tauri/target/${{ matrix.target }}/release" ]; then
+            ARTIFACT_DIR="noteflow_frontend/src-tauri/target/${{ matrix.target }}/release"
+          fi
+
+          # 查找签名文件（可能伴随 bundle 产物生成）
+          SIG_FILE=""
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            SIG_FILE=$(find "$ARTIFACT_DIR" -name "*.msi.sig" -o -name "*.exe.sig" 2>/dev/null | head -1)
+          else
+            SIG_FILE=$(find "$ARTIFACT_DIR" -name "*.dmg.sig" -o -name "*.app.tar.gz.sig" 2>/dev/null | head -1)
+          fi
+
+          if [ -n "$SIG_FILE" ]; then
+            cp "$SIG_FILE" "${{ matrix.updater_platform }}.sig"
+            echo "Signature saved to ${{ matrix.updater_platform }}.sig"
+          else
+            echo "No signature file found, checking bundle directory..."
+            ls -la "$ARTIFACT_DIR"/bundle/ 2>/dev/null || true
+            # 也尝试 bundle 目录
+            SIG_FILE=$(find "$ARTIFACT_DIR/bundle" -name "*.sig" 2>/dev/null | head -1)
+            if [ -n "$SIG_FILE" ]; then
+              cp "$SIG_FILE" "${{ matrix.updater_platform }}.sig"
+              echo "Signature saved to ${{ matrix.updater_platform }}.sig"
+            else
+              echo "WARNING: No signature file found. Update will not work for this platform."
+            fi
+          fi
+
+      - name: Upload platform signature
+        uses: actions/upload-artifact@v4
+        with:
+          name: sig-${{ matrix.updater_platform }}
+          path: ${{ matrix.updater_platform }}.sig
+          if-no-files-found: ignore
+
+  release:
+    name: Generate update.json and publish
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all signatures
+        uses: actions/download-artifact@v4
+        with:
+          pattern: sig-*
+          merge-multiple: true
+
+      - name: Generate update.json
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          REPO="${{ github.repository }}"
+          TAG="${{ github.ref_name }}"
+
+          # 构建 platforms 对象，只包含有签名文件的平台
+          PLATFORMS="{"
+
+          # Windows
+          if [ -f "windows-x86_64.sig" ]; then
+            WIN_SIG=$(cat windows-x86_64.sig | tr -d '\n')
+            # Windows 安装包通常命名为 NoteFlow_${VERSION}_x64-setup.exe
+            WIN_URL="https://github.com/${REPO}/releases/download/${TAG}/NoteFlow_${VERSION}_x64-setup.exe"
+            # 也试试其他可能的文件名
+            PLATFORMS="${PLATFORMS}\"windows-x86_64\": {\"signature\": \"${WIN_SIG}\", \"url\": \"${WIN_URL}\"},"
+          fi
+
+          # macOS ARM
+          if [ -f "darwin-aarch64.sig" ]; then
+            ARM_SIG=$(cat darwin-aarch64.sig | tr -d '\n')
+            ARM_URL="https://github.com/${REPO}/releases/download/${TAG}/NoteFlow_${VERSION}_aarch64.dmg"
+            PLATFORMS="${PLATFORMS}\"darwin-aarch64\": {\"signature\": \"${ARM_SIG}\", \"url\": \"${ARM_URL}\"},"
+          fi
+
+          # macOS Intel
+          if [ -f "darwin-x86_64.sig" ]; then
+            X64_SIG=$(cat darwin-x86_64.sig | tr -d '\n')
+            X64_URL="https://github.com/${REPO}/releases/download/${TAG}/NoteFlow_${VERSION}_x64.dmg"
+            PLATFORMS="${PLATFORMS}\"darwin-x86_64\": {\"signature\": \"${X64_SIG}\", \"url\": \"${X64_URL}\"},"
+          fi
+
+          # 去掉末尾的逗号
+          PLATFORMS="${PLATFORMS%,}}"
+
+          cat > update.json <<EOF
+          {
+            "version": "${VERSION}",
+            "notes": "See https://github.com/${REPO}/blob/main/docs/changelog/V0.x.x.md for details.",
+            "pub_date": "${TIMESTAMP}",
+            "platforms": ${PLATFORMS}
+          }
+          EOF
+
+          echo "Generated update.json:"
+          cat update.json
+
+      - name: Upload update.json to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: update.json
+          fail_on_unmatched_files: false

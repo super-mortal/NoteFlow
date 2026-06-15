@@ -23,11 +23,44 @@ import {
   Sparkles,
   Command,
   ChevronRight,
+  RefreshCw,
+  Download,
 } from 'lucide-react'
 import logo from '@/assets/icon.png'
 import { useInView } from 'react-intersection-observer'
+import { useState, useEffect, useCallback } from 'react'
+import { Progress } from 'antd'
+import { isTauri } from '@tauri-apps/api/core'
 
 const DISPLAY_VERSION = __APP_VERSION__
+
+/* ── Check for updates ── */
+
+// GitHub API 检查最新版本（通用，桌面端和 Web 共用 */
+async function checkGitHubLatestVersion(): Promise<{ latest: string; url: string } | null> {
+  try {
+    const res = await fetch(
+      'https://api.github.com/repos/super-mortal/NoteFlow/releases/latest',
+      { signal: AbortSignal.timeout(10000) }
+    )
+    if (!res.ok) return null
+    const data = await res.json()
+    const tag = data.tag_name ?? ''
+    const version = tag.startsWith('v') ? tag.slice(1) : tag
+    return { latest: version, url: data.html_url ?? '' }
+  } catch {
+    return null
+  }
+}
+
+type UpdateState =
+  | { type: 'idle' }
+  | { type: 'checking' }
+  | { type: 'up-to-date' }
+  | { type: 'available'; version: string; body?: string }
+  | { type: 'downloading'; progress: number }
+  | { type: 'downloaded' }
+  | { type: 'error'; message: string }
 
 /* ── A simple fade-in-up wrapper ── */
 function FadeInSection({
@@ -118,6 +151,101 @@ const features = [
 ]
 
 export default function AboutPage() {
+  const [updateState, setUpdateState] = useState<UpdateState>({ type: 'idle' })
+  const [upgradeInfo, setUpgradeInfo] = useState<{ version: string; body: string } | null>(null)
+
+  const checkForUpdates = useCallback(async () => {
+    setUpdateState({ type: 'checking' })
+
+    if (isTauri()) {
+      // 桌面端：使用 Tauri updater
+      try {
+        const { check } = await import('@tauri-apps/plugin-updater')
+        const { relaunch } = await import('@tauri-apps/plugin-process')
+        const updateResult = await check()
+        if (updateResult?.available) {
+          setUpgradeInfo({ version: updateResult.version, body: updateResult.body ?? '' })
+          setUpdateState({ type: 'available', version: updateResult.version, body: updateResult.body })
+        } else {
+          // 没有新版本但 GitHub 可能有（updater 基于 update.json，可能延迟），
+          // 再查 GitHub API 做兜底
+          const gh = await checkGitHubLatestVersion()
+          if (gh && gh.latest !== DISPLAY_VERSION) {
+            setUpgradeInfo({ version: gh.latest, body: '' })
+            setUpdateState({ type: 'available', version: gh.latest })
+          } else {
+            setUpdateState({ type: 'up-to-date' })
+          }
+        }
+      } catch (e) {
+        // 失败时降级到 GitHub API
+        const gh = await checkGitHubLatestVersion()
+        if (gh && gh.latest !== DISPLAY_VERSION) {
+          setUpgradeInfo({ version: gh.latest, body: '' })
+          setUpdateState({ type: 'available', version: gh.latest })
+        } else {
+          setUpdateState({ type: 'error', message: String(e) })
+        }
+      }
+    } else {
+      // Docker / Web：检查 GitHub API
+      const gh = await checkGitHubLatestVersion()
+      if (gh && gh.latest !== DISPLAY_VERSION) {
+        setUpgradeInfo({ version: gh.latest, body: '' })
+        setUpdateState({ type: 'available', version: gh.latest })
+      } else {
+        setUpdateState({ type: 'up-to-date' })
+      }
+    }
+  }, [])
+
+  const handleUpdateNow = useCallback(async () => {
+    if (!isTauri()) {
+      // 非桌面端：跳转到 GitHub Releases
+      window.open('https://github.com/super-mortal/NoteFlow/releases/latest', '_blank')
+      setUpdateState({ type: 'idle' })
+      setUpgradeInfo(null)
+      return
+    }
+
+    // 桌面端：下载并安装
+    try {
+      setUpdateState({ type: 'downloading', progress: 0 })
+      const { check } = await import('@tauri-apps/plugin-updater')
+      const { relaunch } = await import('@tauri-apps/plugin-process')
+      const updateResult = await check()
+      if (updateResult?.available) {
+        const interval = setInterval(() => {
+          setUpdateState(prev => ({
+            ...prev,
+            type: 'downloading' as const,
+            progress: Math.min((prev as any).progress + 0.1, 0.9),
+          }))
+        }, 2000)
+        await updateResult.downloadAndInstall()
+        clearInterval(interval)
+        setUpdateState({ type: 'downloaded' })
+        setUpgradeInfo(null)
+        await relaunch()
+      }
+    } catch {
+      setUpdateState({ type: 'error', message: '下载更新失败，请稍后重试' })
+    }
+  }, [])
+
+  const handleSkip = useCallback(() => {
+    setUpdateState({ type: 'idle' })
+    setUpgradeInfo(null)
+  }, [])
+
+  // 自动检查更新（只在桌面端启动时检查一次）
+  useEffect(() => {
+    if (isTauri()) {
+      const timer = setTimeout(() => checkForUpdates(), 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [checkForUpdates])
+
   return (
     <ScrollArea className="h-full overflow-y-auto">
       <div className="mx-auto min-h-full max-w-4xl px-6 py-12 md:py-16">
@@ -183,9 +311,129 @@ export default function AboutPage() {
                   开始使用
                 </a>
               </Button>
+              <Button
+                variant="outline"
+                className="gap-2"
+                onClick={checkForUpdates}
+                disabled={updateState.type === 'checking'}
+              >
+                <RefreshCw className={`h-4 w-4 ${updateState.type === 'checking' ? 'animate-spin' : ''}`} />
+                {updateState.type === 'checking'
+                  ? '检查中...'
+                  : updateState.type === 'up-to-date'
+                    ? '已是最新'
+                    : '检查更新'}
+              </Button>
             </div>
           </div>
         </FadeInSection>
+
+        {/* ═══ 更新弹窗 ═══ */}
+        {updateState.type === 'available' && upgradeInfo && (
+          <FadeInSection delay={50}>
+            <section className="mb-14">
+              <Card className="border-primary/30 shadow-sm">
+                <CardContent className="p-5 md:p-6">
+                  <div className="flex flex-col items-center text-center">
+                    <Download className="mb-3 h-8 w-8 text-primary" />
+                    <h2 className="mb-2 text-lg font-semibold">发现新版本 v{upgradeInfo.version}</h2>
+                    <p className="text-text-secondary mb-4 text-sm leading-relaxed">
+                      当前版本 v{DISPLAY_VERSION}，是否下载更新？
+                    </p>
+                    {upgradeInfo.body && (
+                      <div className="mb-4 max-h-32 w-full overflow-y-auto rounded-lg bg-muted/40 p-3 text-left text-xs leading-relaxed">
+                        {upgradeInfo.body}
+                      </div>
+                    )}
+                    <div className="flex gap-3">
+                      <Button onClick={handleUpdateNow} className="gap-2">
+                        <Download className="h-4 w-4" />
+                        立即更新
+                      </Button>
+                      <Button variant="outline" onClick={handleSkip}>
+                        稍后再说
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </section>
+          </FadeInSection>
+        )}
+
+        {updateState.type === 'downloading' && (
+          <FadeInSection delay={50}>
+            <section className="mb-14">
+              <Card className="border-primary/30 shadow-sm">
+                <CardContent className="p-5 md:p-6">
+                  <div className="flex flex-col items-center text-center">
+                    <h2 className="mb-3 text-lg font-semibold">正在下载更新...</h2>
+                    <Progress
+                      percent={Math.round(((updateState as any).progress ?? 0) * 100)}
+                      status="active"
+                      className="w-full max-w-sm"
+                    />
+                    <p className="text-text-tertiary mt-3 text-xs">
+                      下载完成后将自动重启应用
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </section>
+          </FadeInSection>
+        )}
+
+        {updateState.type === 'downloaded' && (
+          <FadeInSection delay={50}>
+            <section className="mb-14">
+              <Card className="border-success/30 shadow-sm">
+                <CardContent className="p-5 md:p-6">
+                  <div className="flex flex-col items-center text-center">
+                    <h2 className="mb-1 text-lg font-semibold text-success">更新完成</h2>
+                    <p className="text-text-secondary text-sm">应用正在重启以应用更新...</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </section>
+          </FadeInSection>
+        )}
+
+        {updateState.type === 'error' && (
+          <FadeInSection delay={50}>
+            <section className="mb-14">
+              <Card className="border-red-300 shadow-sm">
+                <CardContent className="p-5 md:p-6">
+                  <div className="flex flex-col items-center text-center">
+                    <h2 className="mb-2 text-base font-semibold text-red-500">检查更新失败</h2>
+                    <p className="text-text-tertiary mb-3 text-xs">
+                      {(updateState as any).message || '无法连接到更新服务器，请稍后重试'}
+                    </p>
+                    <Button variant="outline" size="sm" onClick={() => setUpdateState({ type: 'idle' })}>
+                      关闭
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </section>
+          </FadeInSection>
+        )}
+
+        {(updateState.type === 'up-to-date') && (
+          <FadeInSection delay={50}>
+            <section className="mb-14">
+              <Card className="border-border/40 shadow-sm">
+                <CardContent className="p-4 md:p-5">
+                  <div className="flex items-center justify-center gap-2 text-sm">
+                    <span className="text-text-tertiary">当前已是最新版本</span>
+                    <Badge variant="secondary" className="text-xs">
+                      v{DISPLAY_VERSION}
+                    </Badge>
+                  </div>
+                </CardContent>
+              </Card>
+            </section>
+          </FadeInSection>
+        )}
 
         {/* ═══ 项目简介 ═══ */}
         <FadeInSection delay={100}>

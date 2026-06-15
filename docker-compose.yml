@@ -6,26 +6,20 @@ services:
       context: .
       dockerfile: backend/Dockerfile
       args:
-        # 国内拉不到 docker.io 时设置 BASE_REGISTRY=docker.m.daocloud.io（或其他可用镜像）
         BASE_REGISTRY: ${BASE_REGISTRY:-docker.io}
         APT_MIRROR: ${APT_MIRROR:-mirrors.tuna.tsinghua.edu.cn}
         PIP_INDEX: ${PIP_INDEX:-https://pypi.tuna.tsinghua.edu.cn/simple}
+    image: ghcr.io/super-mortal/noteflow/backend:latest
     env_file:
       - .env
     environment:
       - BACKEND_PORT=${BACKEND_PORT}
       - BACKEND_HOST=${BACKEND_HOST}
     volumes:
-      # 把整个 backend/ 目录绑到 /app，意味着这些都持久化到宿主机、删容器不丢：
-      #   ./backend/data/noteflow.db              — SQLite 数据库（含 LLM 供应商配置、笔记历史）
-      #   ./backend/data/notes/                   — 生成的 Markdown 笔记
-      #   ./backend/data/screenshots/             — 视频截图
-      #   ./backend/uploads/                      — 上传的本地视频
+      # 本地开发时挂载整个目录支持热重载；生产部署无需挂载（镜像已包含代码）
       - ./backend:/app
     expose:
-      - "${BACKEND_PORT}"  # 不再对外暴露，用于 nginx 内部通信
-    # 用 unless-stopped 而非 on-failure:N，避免任何短暂崩溃把容器永久打死后
-    # 再也接收不到用户修过的 .env。手动 docker-compose stop 仍可正常停下。
+      - "${BACKEND_PORT}"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:${BACKEND_PORT}/api/sys_health"]
@@ -33,8 +27,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 15s
-    # WHISPER_MODEL_SIZE 选 medium 及以上请把这里调到 8g+，
-    # 否则首次模型加载时容易被 host OOM-killer 干掉。
     mem_limit: 4g
 
   frontend:
@@ -44,10 +36,11 @@ services:
       dockerfile: noteflow_frontend/Dockerfile
       args:
         BASE_REGISTRY: ${BASE_REGISTRY:-docker.io}
+    image: ghcr.io/super-mortal/noteflow/frontend:latest
     env_file:
       - .env
     expose:
-      - "80"  # 不暴露给宿主机，只供 nginx 访问
+      - "80"
     restart: unless-stopped
     mem_limit: 512m
 
@@ -65,3 +58,15 @@ services:
         condition: service_started
     restart: unless-stopped
     mem_limit: 256m
+
+  watchtower:
+    container_name: noteflow-watchtower
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_POLL_INTERVAL=86400
+    command: noteflow-backend noteflow-frontend noteflow-nginx
+    restart: unless-stopped
+    mem_limit: 64m
