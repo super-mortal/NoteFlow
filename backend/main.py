@@ -106,4 +106,8 @@ if __name__ == "__main__":
     host = os.getenv("BACKEND_HOST", "0.0.0.0")
     logger.info(f"Starting server on {host}:{port}")
     reload = os.getenv("ENV", "production") != "production"
-    uvicorn.run(app, host=host, port=port, reload=reload)
+    
+    # PyInstaller 打包后 sys.stdout 可能为 None，导致 uvicorn 默认日志配置失败
+    # 使用 log_config=None 禁用 uvicorn 的日志配置，避免 'NoneType' object has no attribute 'isatty'
+    # 日志已通过 app/utils/logger.py 配置，不需要 uvicorn 的默认日志
+    uvicorn.run(app, host=host, port=port, reload=reload, log_config=None)
